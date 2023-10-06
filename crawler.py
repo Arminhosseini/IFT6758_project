@@ -95,9 +95,12 @@ class Crawler:
     def write_data(self):
         for season, season_data in self.data.items():
             for type, data in season_data.items():
-                file_path = self.dataset_path / f"{season}-{type}.json"
-                with open(file_path, "w") as file:
-                    json.dump(data, file)
+                file_dir = self.dataset_path.joinpath(str(season), str(type))
+                file_dir.mkdir(parents=True, exist_ok=True)
+                for game_data in data:
+                    file_name = f"{game_data['gamePk']}.json"
+                    with open(file_dir / file_name, "w") as file:
+                        json.dump(game_data, file)
 
     def crawl(self):
         self.get_total_data()
