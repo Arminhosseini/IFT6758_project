@@ -33,7 +33,6 @@ class Crawler:
 
     def get_game_data(self, game_id):
         game_url = self.get_url(game_id)
-        print(game_url)
         response = requests.get(game_url)
         if response.status_code != 200:
             raise Exception("404 Page Not Found")
@@ -88,9 +87,11 @@ class Crawler:
 
     def get_total_data(self, start_season=2016, end_season=2020):
         for season in range(start_season, end_season + 1):
+            print(f"[INFO] Start season {season}")                       
             self.data[season] = dict()
             self.data[season]["regular_season"] = self.get_regular_data(season)
             self.data[season]["playoffs"] = self.get_playoff_data(season)
+            print(f"[INFO] End season {season}")            
 
     def write_data(self):
         for season, season_data in self.data.items():
