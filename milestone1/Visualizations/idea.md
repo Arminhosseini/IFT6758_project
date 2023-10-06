@@ -1,8 +1,9 @@
 Simple Visualizations
+
 Question 1: Comparing Shot Types
-To compare shot types over all teams in a season, we can create a bar chart that displays the number of each shot type (e.g., headers, volleys, penalties) as bars, 
-and overlay the number of goals as a line on top of the bars. This will allow us to visually identify the most common and most dangerous shot types.
-In the discussion for our blog post, we can analyze the figure and identify which shot type appears to be the most dangerous (highest goal-to-shot ratio) and the most common (highest number of shots).
+I chose the 2016 season (including both the regular season and playoffs) to produce a figure that compares shot types across all teams. In analyzing the data, it becomes clear that the most dangerous type of shot is the "deflected" shot, with the highest goal percentage of 19.8%. This suggests that deflected shots have a significantly higher chance of resulting in a goal compared to other shot types.
+
+On the other hand, the most common type of shot is the "wrist shot," as indicated by the highest bar in the histogram. The reason I chose this figure is that it provides a straightforward visual representation of the shot and goal counts for each shot type, allowing us to easily compare their quantities and ratios. It's a valuable tool for understanding which shot types are both frequent and effective in scoring goals.
 
 Question 2: Relationship between Shot Distance and Goal Chance
 To analyze the relationship between shot distance and the chance of it being a goal for each season between 2018-19 and 2020-21, we can create scatter plots. 
