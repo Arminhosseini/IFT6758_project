@@ -15,6 +15,7 @@ class Crawler:
             "playoffs": "03",
             "all-star": "04",
         }
+        self.inv_game_types = {v: k for k, v in self.game_types.items()}
 
         self.data = dict()
 
@@ -101,6 +102,25 @@ class Crawler:
                     file_name = f"{game_data['gamePk']}.json"
                     with open(file_dir / file_name, "w") as file:
                         json.dump(game_data, file)
+
+    def read_data(self):
+        data = dict()
+        for game_data_path in self.dataset_path.glob("**/**/*.json"):
+            tokens = str(game_data_path).split(".")[0].split("/")[1:4]
+            season, type, game_id = int(tokens[0]), tokens[1], int(tokens[2])
+            if season not in data:
+                data[season] = dict()
+            if type not in data[season]:
+                data[season][type] = dict()
+            data[season][type][game_id] = json.loads(open(game_data_path, "r").read())
+        return data
+
+    def read_data_by_game_id(self, game_id):
+        game_id_str = str(game_id)
+        season = game_id_str[:4]
+        type = self.inv_game_types[game_id_str[4:6]]
+        file_path = self.dataset_path.joinpath(season, type, f"{game_id_str}.json")
+        return json.loads(open(file_path, "r").read())
 
     def crawl(self):
         self.get_total_data()
