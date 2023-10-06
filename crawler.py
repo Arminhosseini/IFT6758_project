@@ -58,7 +58,8 @@ class Crawler:
         round, matchup, game = 1, 1, 1
         while True:
             try:
-                game_id = self.get_playoff_game_id(season, round, matchup, game)
+                game_id = self.get_playoff_game_id(
+                    season, round, matchup, game)
                 game_data = self.get_game_data(game_id)
                 data.append(game_data)
             except Exception as e:
@@ -66,7 +67,8 @@ class Crawler:
                     matchup += 1
                     game = 1
                     try:
-                        game_id = self.get_playoff_game_id(season, round, matchup, game)
+                        game_id = self.get_playoff_game_id(
+                            season, round, matchup, game)
                         game_data = self.get_game_data(game_id)
                         data.append(game_data)
                     except Exception as e:
