@@ -56,8 +56,14 @@ def tidy_data(path):
     df.loc[:, "strength"] = df["allPlays"].apply(lambda x: x.get(
         "result")["strength"]["name"] if x.get("result")["event"] == "Goal" else False)
     df = df.drop(columns=['allPlays'])
-    df.to_csv('Dataset/tidyData.csv', mode='a', index=False)
+    return df
 
 
-for file in listdir('Dataset'):
-    tidy_data(file)
+file_list = listdir('Dataset')
+for file in file_list:
+    data_frame = tidy_data(file)
+    if file_list.index(file) == 0:
+        data_frame.to_csv('Dataset/tidyData.csv', mode='a', index=False)
+    else:
+        data_frame.to_csv('Dataset/tidyData.csv', mode='a',
+                          index=False, header=False)
