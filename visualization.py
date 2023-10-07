@@ -9,43 +9,39 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-def Convert_Coord_NHL_2_Image(list_x_coor, list_y_coor, image_width = 1100, image_height = 467, nhl_rink_width = 200, nhl_rink_length = 85):
-    """Function convert from NHL coordinate ice rink to Image coordiante
+# def Convert_Coord_NHL_2_Image(list_x_coor, list_y_coor, image_width = 200, image_height = 85, nhl_rink_width = 200, nhl_rink_length = 85):
+#     """Function convert from NHL coordinate ice rink to Image coordiante
 
-    Args:
-        nhl_x (): 
-        nhl_y (): 
-        image_width (int):. 
-        image_height (int): 
-        nhl_rink_width (int): 
-        nhl_rink_length (int): 
+#     Args:
+#         nhl_x (integer): coordinate of the shot in NHL rink 
+#         nhl_y (integer): coordinate of the shot in NHL rink 
 
-    Returns:
-        (image_x, image_y) (int, int): the coordinate of in Image space
-    """
+#     Returns:
+#         (image_x, image_y) (int, int): the coordinate of in Image space
+#     """
     
-    transformation_matrix = np.array([
-        [1, 0, image_width / 2],
-        [0, -1, image_height / 2],  
-        [0, 0, 1]
-    ])
+#     transformation_matrix = np.array([
+#         [1, 0, image_width / 2],
+#         [0, -1, image_height / 2],  
+#         [0, 0, 1]
+#     ])
     
-    for (i, (nhl_x_coor, nhl_y_coor)) in enumerate(zip(list_x_coor, list_y_coor)):
+#     for (i, (nhl_x_coor, nhl_y_coor)) in enumerate(zip(list_x_coor, list_y_coor)):
     
-        # Convert NHL coordinates to image coordinates
-        image_x = (nhl_x_coor / nhl_rink_width) * image_width
-        image_y = (nhl_y_coor / nhl_rink_length) * image_height 
+#         # Convert NHL coordinates to image coordinates
+#         image_x = (nhl_x_coor / nhl_rink_width) * image_width
+#         image_y = (nhl_y_coor / nhl_rink_length) * image_height 
         
-        image_matrix_coor = np.dot(transformation_matrix, np.array([image_x, image_y, 1]))
-        image_x = image_matrix_coor[0]
-        image_y = image_matrix_coor[1]
+#         image_matrix_coor = np.dot(transformation_matrix, np.array([image_x, image_y, 1]))
+#         image_x = image_matrix_coor[0]
+#         image_y = image_matrix_coor[1]
         
-        image_x -= image_width/2
+#         image_x -= image_width/2
         
-        list_x_coor[i] = int(image_x)
-        list_y_coor[i] = int(image_y)
+#         list_x_coor[i] = int(image_x)
+#         list_y_coor[i] = int(image_y)
         
-    return (list_x_coor, list_y_coor)
+#     return (list_x_coor, list_y_coor)
 
 
 def Correct_Side_Rink_Coordinate(list_x_coor, list_y_coor):
@@ -71,11 +67,15 @@ if __name__ == "__main__":
     # =========================== Hyper Parameter ===========================
     path_tidy_data_csv = r"Dataset\tidyData.csv"
     
-    bin_width = 10
-    image_width = 1100
-    image_height = 467
+    bin_width = 5
+    
+    # image_width = 200
+    # image_height = 85
+    
     nhl_rink_width = 200
-    nhl_rink_length = 85
+    nhl_rink_height = 85
+    
+    extent_coordinate = [0, nhl_rink_width//2, -nhl_rink_height//2, nhl_rink_height//2]
     
     game_types = {
             "preseason": "01",
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     
     ice_rink_image_path = os.path.join("Image", "half_nhl_rink.png")
     
-    alpha = 0.4
+    alpha = 0.35
     
     path_folder_shot_map = os.path.join("Image", "shot_map_team")
 
@@ -94,11 +94,10 @@ if __name__ == "__main__":
    
     # 1. Read df
     df = pd.read_csv(path_tidy_data_csv, low_memory=False)
-    df.drop([5436, 80400, 85665, 167539, 173001, 253480, 258848, 327349, 332676], inplace=True)
-    df.reset_index(drop=True, inplace=True)
 
     # 2. Read shot df
     df_shot = df[df['eventType'] == "Shot"]
+    df_shot['gamePk'] = df_shot['gamePk'].astype(str)
     df_shot = df_shot.dropna(subset=['x-coordinate', 'y-coordinate']) # Drop row with NaN value
     df_shot.reset_index(drop=True, inplace=True)
 
@@ -116,6 +115,9 @@ if __name__ == "__main__":
                         'Carolina Hurricanes', 'Winnipeg Jets', 'Dallas Stars', 'Philadelphia Flyers', 'Colorado Avalanche',\
                         'Arizona Coyotes', 'Vancouver Canucks', 'Vegas Golden Knights']
     
+    # list_season = ["2017"]
+    # list_team_names = ['San Jose Sharks']
+    
     for season in list_season:
         path_folder_shot_map_season = os.path.join(path_folder_shot_map, season)
         if os.path.exists(path_folder_shot_map_season) == False:
@@ -132,16 +134,17 @@ if __name__ == "__main__":
 
         # 3.2 Process coordinate of current season
         (list_x_coor_season, list_y_coor_season) = Correct_Side_Rink_Coordinate(list_x_coor_season, list_y_coor_season)
-        (list_x_coor_season, list_y_coor_season) = Convert_Coord_NHL_2_Image(list_x_coor_season, list_y_coor_season)
+        # (list_x_coor_season, list_y_coor_season) = Convert_Coord_NHL_2_Image(list_x_coor_season, list_y_coor_season)
         
         # 3.3 Create a 2D histogram with 10 x 10 bins
-        bins = [np.arange(0, image_width//2, bin_width), np.arange(0, image_height, bin_width)]
+        # bins = [np.arange(0, image_width//2 + 1, bin_width), np.arange(0, image_height + 1, bin_width)]
+        bins = [np.arange(0, nhl_rink_width//2 + bin_width, bin_width),\
+                np.arange(-nhl_rink_height//2, nhl_rink_height//2 + bin_width, bin_width)]
         hist_season, x_edges, y_edges = np.histogram2d(list_x_coor_season, list_y_coor_season, bins=bins)
 
         # 3.4 Calculate league shot rate per hour
         total_num_game_season = len(current_season_df['gamePk'].unique())
-        hist_season = hist_season / total_num_game_season
-        
+        hist_season = hist_season / (total_num_game_season*2)
         # hist_season = gaussian_filter(hist_season, sigma=3) # Smooth histogram
         
         # 3.5 Loop through all team
@@ -158,7 +161,7 @@ if __name__ == "__main__":
             
             # --- c. Process coordinate 
             (list_x_coor_team, list_y_coor_team) = Correct_Side_Rink_Coordinate(list_x_coor_team, list_y_coor_team)
-            (list_x_coor_team, list_y_coor_team) = Convert_Coord_NHL_2_Image(list_x_coor_team, list_y_coor_team)
+            # (list_x_coor_team, list_y_coor_team) = Convert_Coord_NHL_2_Image(list_x_coor_team, list_y_coor_team)
             
             # --- d. Create a 2D histogram with 10 x 10 bins
             hist_team, x_edges, y_edges = np.histogram2d(list_x_coor_team, list_y_coor_team, bins=bins)
@@ -169,20 +172,29 @@ if __name__ == "__main__":
 
             # --- f. Compare this team vs league about shot rate per hour
             hist_diff = hist_team - hist_season
-            hist_diff = gaussian_filter(hist_diff, sigma=3) # Smooth histogram
+            hist_diff = gaussian_filter(hist_diff, sigma=1.5) # Smooth histogram
 
             # --- g. Plot 
+            plt.clf()
+            
             image = Image.open(ice_rink_image_path)
-            plt.imshow(image, alpha=alpha) # Plot ice rink
+            plt.imshow(image, alpha=alpha, extent=extent_coordinate) # Plot ice rink
 
-            color_limit = max(abs(hist_diff.min()), abs(hist_diff.max()))
-            plt.imshow(hist_diff.T, cmap='RdBu_r', extent=[0, image_width//2, 0, image_height], alpha=0.6, vmin=-color_limit, vmax=+color_limit)
-            plt.colorbar(label='Excess shot rate per hours')
-
-            plt.xlabel('X')
-            plt.ylabel('Y')
+            plt.xlabel('Distance from the center red line (ft)')
+            plt.ylabel('Distance from the center of rink (ft)')
             plt.title(f"{team_name} Offence \n Shot rate per hour compared to league \n Season {season}-{int(season)+1}")
-            # plt.show()
+            
+            data_min= hist_diff.min()
+            data_max= hist_diff.max()
+
+            if abs(data_min) > data_max:
+                data_max = data_min * -1
+            elif data_max > abs(data_min):
+                data_min = data_max * -1
+
+            plt.contourf(hist_diff.T, extent=extent_coordinate, vmin=data_min, vmax=data_max,\
+                        cmap='RdBu_r', levels = np.linspace(data_min, data_max, 12), alpha=1-alpha)
+            plt.colorbar(label='Excess shot rate per hours')
             
             # --- h. Save shot map image
             file_name_shot_map = f"{season}_{team_name}.jpg"

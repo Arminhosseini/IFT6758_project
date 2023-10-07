@@ -68,3 +68,5 @@ for file in file_list:
     else:
         data_frame.to_csv('Dataset/tidyData.csv', mode='a',
                           index=False, header=False)
+        
+    print(f"Done {file}")
