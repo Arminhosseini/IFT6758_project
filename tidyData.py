@@ -77,13 +77,19 @@ def tidy_data(path):
         # Drop the "allPlays" column
         df = df.drop(columns=['allPlays'])
 
-        # Save the cleaned and tidied data to a CSV file
-        df.to_csv('Dataset/tidyData.csv', mode='a', index=False)
+        # Return the cleaned and tidied data
+        return df
 
     except ValueError as e:
         print(f"Error reading JSON file {path}: {e}")
 
 
 # Iterate over JSON files in the 'Dataset' directory and tidy each one
-for file in listdir('Dataset'):
-    tidy_data(file)
+file_list = listdir('Dataset')
+for file in file_list:
+    data_frame = tidy_data(file)
+    if file_list.index(file) == 0:
+        data_frame.to_csv('Dataset/tidyData.csv', mode='a', index=False)
+    else:
+        data_frame.to_csv('Dataset/tidyData.csv', mode='a',
+                          index=False, header=False)
