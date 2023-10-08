@@ -245,7 +245,7 @@ class HockeyFigure:
         if save_fig:
             figures_dir = SAVE_FIG_PATH
             os.makedirs(figures_dir, exist_ok=True)
-            fig_path = os.path.join(figures_dir, 'combined_distance_and_type_vs_goal_for_2016-2017.png')
+            fig_path = os.path.join(figures_dir, f'Q5-3_distance_and_type_vs_goal_for_2016-2017.png')
             plt.savefig(fig_path)
 
         # Show the combined plot
