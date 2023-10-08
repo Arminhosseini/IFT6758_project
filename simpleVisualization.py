@@ -1,15 +1,16 @@
 import os.path
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import math
 
 # get the tidy data path
 TIDY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'Dataset', 'tidyData.csv')
 
 # save the figures
 SAVE_FIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'images', 'simpleVisualization'))
+
 
 # Define a function to compute shot distance based on attackingSide
 def compute_shot_distance(row):
@@ -25,7 +26,6 @@ def compute_shot_distance(row):
         raise ValueError("Invalid value in 'attackingSide' column")
 
     return np.sqrt((x - goal_position[0]) ** 2 + (y - goal_position[1]) ** 2)
-
 
 
 class HockeyFigure:
@@ -136,10 +136,12 @@ class HockeyFigure:
 
             # Perform smoothing (e.g., rounding to nearest integer)
             shot_events_df['smoothed_shot_distance'] = shot_events_df['shot_distance'].round(0)
+            total_num_shots = shot_events_df.shape[0]
 
             # Group the data by smoothed_shot_distance and calculate the mean goal probability
-            smoothed_grouped_df = shot_events_df.groupby("smoothed_shot_distance")['is_goal'].mean().reset_index()
-
+            smoothed_grouped_df = shot_events_df.groupby("smoothed_shot_distance")['is_goal'].count().reset_index()
+            smoothed_grouped_df['is_goal'] = smoothed_grouped_df['is_goal'] / total_num_shots
+            # print(smoothed_grouped_df)
             # Create a figure and axis for the plot
             fig = plt.figure(figsize=(10, 6))
             ax = sns.lineplot(x='smoothed_shot_distance', y='is_goal', data=smoothed_grouped_df)
@@ -151,7 +153,6 @@ class HockeyFigure:
             ax.set_axisbelow(True)
             ax.yaxis.grid(color='gray', linestyle='dashed')
             ax.set_xlim(0, 200)
-            ax.set_ylim(0, 1)
 
             # Set x-axis ticks to be at intervals of 10
             plt.xticks(np.arange(0, 210, 10))
@@ -205,41 +206,36 @@ class HockeyFigure:
         # Get unique shot types
         unique_shot_types = season_df['shotType'].cat.categories
 
-        # Calculate the number of rows and columns for subplots
-        num_subplots = len(unique_shot_types)
-        num_cols = 2  # Two columns
-        num_rows = math.ceil(num_subplots / num_cols)
-
         # Create a figure and axis for subplots
-        fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 6 * num_rows))
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        # Define a colormap with unique colors for each shot type
+        colormap = matplotlib.colormaps['tab10']
 
         for i, shot_type in enumerate(unique_shot_types):
-            # Calculate the row and column index for the current subplot
-            row_idx = i // num_cols
-            col_idx = i % num_cols
-
             # Filter the data for the current shot type
             shot_type_df = season_df[season_df['shotType'] == shot_type]
+            total_num_shots = shot_type_df.shape[0]
 
             # Group the data by both 'shotType' and 'smoothed_shot_distance'
             grouped_df = shot_type_df.groupby(['shotType', 'smoothed_shot_distance'], observed=False)[
-                'is_goal'].mean().reset_index()
+                'is_goal'].count().reset_index()
 
-            # Plot the line for the current shot type on the corresponding subplot
-            ax = axes[row_idx, col_idx]
-            sns.lineplot(x='smoothed_shot_distance', y='is_goal', data=grouped_df, ax=ax)
-            ax.set_title(f'Goal Percentage by Shot Distance for {shot_type} Shots')  # Individual shot type title
-            ax.set_xlabel('Shot Distance (feet)')
-            ax.set_ylabel('Average Goal Percentage')
-            ax.legend([shot_type]).set_visible(False)
-            ax.set_xlim(0, 200)
+            grouped_df['is_goal'] = grouped_df['is_goal'] / total_num_shots
+            # Plot the line for the current shot type on the same subplot with a unique color
+            color = colormap(i)
+            sns.lineplot(x='smoothed_shot_distance', y='is_goal', data=grouped_df, ax=ax, label=shot_type, color=color)
 
-        # Remove any empty subplots
-        for i in range(num_subplots, num_rows * num_cols):
-            fig.delaxes(axes.flatten()[i])
+        # Set plot labels and limits
+        ax.set_title('Goal Percentage by Shot Distance for Different Shot Types')
+        ax.set_xlabel('Shot Distance (feet)')
+        ax.set_ylabel('Average Goal Percentage')
+        ax.legend(loc='upper right')
+        ax.set_xlim(0, 200)
+        ax.set_ylim(0, 0.05)
 
-        # Adjust layout
-        plt.tight_layout()
+        # Set x-axis ticks to be at intervals of 10
+        plt.xticks(np.arange(0, 210, 10))
 
         # Save the figure if requested
         if save_fig:
@@ -252,6 +248,7 @@ class HockeyFigure:
         plt.show()
 
         return fig
+
 
 if __name__ == "__main__":
     # Read the DataFrame
