@@ -12,10 +12,12 @@ Question 2:
 
 Relationship between Shot Distance and Goal Chance 
 
-In general, in ice hockey matches, the closer the shot distance to the goal, the higher the probability of scoring. This is because, when closer to the goal, the goalkeeper's defensive range is smaller, giving the shooting player a better chance to put the puck into the net. As seen in my chart, it's evident that the probability of scoring is significantly higher for shot distances less than 10 feet compared to shot distances greater than 10 feet. This trend remained consistent across the years 2018, 2019, and 2020. I chose to use a lineplot graph because it allows for a direct visualization of how the goal-scoring probability changes with varying shot distances.
+In ice hockey matches, it is generally observed that the closer the shot distance to the goal, the higher the probability of scoring. This is because when a player is closer to the goal, the goalkeeper's defensive range is reduced, increasing the chances of successfully putting the puck into the net. As evident in the chart, it is clear that the scoring probability is significantly higher for shot distances less than 70 feet when compared to shot distances greater than 70 feet. This trend remained consistent across the years 2018, 2019, and 2020. I opted for a line plot graph as it provides a direct visualization of how the likelihood of scoring changes with varying shot distances.
 
 Question 3: 
 
 Goal Percentage by Shot Distance and Type
 
-In accordance with the chart and data, the most dangerous goal-scoring method is likely "deflected" because it has the highest scoring rate.
+In this analysis, I utilized data from the year 2016, including both regular season and playoff games. The figure reveals that there isn't a single shot type that stands out as the most dangerous across all shot distances. Instead, each shot type has its own optimal goal-scoring range.
+
+It's evident that when the shot distance is less than 10 feet, the "wrap-around" shot type appears to be the most dangerous, as it boasts the highest average goal-scoring probability in that range. In the 10 to 20 feet distance range, "Tip-in" or "Deflected" shots are preferable choices. When the shot distance extends to the 20 to 40 feet range, "Snap Shot" becomes a more effective option. For distances greater than 40 feet but less than 70 feet, "Slap Shot" appears to be a favorable choice. However, when the shot distance exceeds 70 feet, the goal-scoring probability for all shot types decreases significantly.
