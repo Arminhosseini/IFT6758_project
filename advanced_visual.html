@@ -1,0 +1,85 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Selector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #image-container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    #selected-image {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    #image-dropdown {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Shot map visualization of 2016</h1>
+  
+  <div id="image-container">
+    <img id="selected-image" src="Image\shot_map_team\2016\Anaheim Ducks.jpg" alt="Selected Image">
+  </div>
+
+  <label for="image-dropdown">Select an image:</label>
+  <select id="image-dropdown" onchange="updateImage(this)">
+
+    <option value="Image\shot_map_team\2016\Anaheim Ducks.jpg" selected>Anaheim Ducks</option>
+    <option value="Image\shot_map_team\2016\Arizona Coyotes.jpg">Arizona Coyotes</option>
+    <option value="Image\shot_map_team\2016\Boston Bruins.jpg">Boston Bruins</option>
+    <option value="Image\shot_map_team\2016\Buffalo Sabres.jpg">Buffalo Sabres</option>
+    <option value="Image\shot_map_team\2016\Calgary Flames.jpg">Calgary Flames</option>
+    <option value="Image\shot_map_team\2016\Carolina Hurricanes.jpg">Carolina Hurricanes</option>
+    <option value="Image\shot_map_team\2016\Chicago Blackhawks.jpg">Chicago Blackhawks</option>
+    <option value="Image\shot_map_team\2016\Colorado Avalanche.jpg">Colorado Avalanche</option>
+    <option value="Image\shot_map_team\2016\Columbus Blue Jackets.jpg">2016_Boston Bruins</option>
+    <option value="Image\shot_map_team\2016\Dallas Stars.jpg">Dallas Stars</option>
+    <option value="Image\shot_map_team\2016\Detroit Red Wings.jpg">Detroit Red Wings</option>
+    <option value="Image\shot_map_team\2016\Edmonton Oilers.jpg">Edmonton Oilers</option>
+    <option value="Image\shot_map_team\2016\Florida Panthers.jpg">Florida Panthers</option>
+    <option value="Image\shot_map_team\2016\Los Angeles Kings.jpg">Los Angeles Kings</option>
+    <option value="Image\shot_map_team\2016\Minnesota Wild.jpg">Minnesota Wild</option>
+    <option value="Image\shot_map_team\2016\Montréal Canadiens.jpg">Montréal Canadiens</option>
+    <option value="Image\shot_map_team\2016\Nashville Predators.jpg">Nashville Predators</option>
+    <option value="Image\shot_map_team\2016\New Jersey Devils.jpg">New Jersey Devils</option>
+    <option value="Image\shot_map_team\2016\New York Islanders.jpg">New York Islanders</option>
+    <option value="Image\shot_map_team\2016\New York Rangers.jpg">New York Rangers</option>
+    <option value="Image\shot_map_team\2016\Ottawa Senators.jpg">Ottawa Senators</option>
+    <option value="Image\shot_map_team\2016\Philadelphia Flyers.jpg">Philadelphia Flyers</option>
+    <option value="Image\shot_map_team\2016\Pittsburgh Penguins.jpg">Pittsburgh Penguins</option>
+    <option value="Image\shot_map_team\2016\San Jose Sharks.jpg">San Jose Sharks</option>
+    <option value="Image\shot_map_team\2016\St. Louis Blues.jpg">St. Louis Blues</option>
+    <option value="Image\shot_map_team\2016\Tampa Bay Lightning.jpg">Tampa Bay Lightning</option>
+    <option value="Image\shot_map_team\2016\Toronto Maple Leafs.jpg">Toronto Maple Leafs</option>
+    <option value="Image\shot_map_team\2016\Vancouver Canucks.jpg">Vancouver Canucks</option>
+    <option value="Image\shot_map_team\2016\Washington Capitals.jpg">Washington Capitals</option>
+    <option value="Image\shot_map_team\2016\Winnipeg Jets.jpg">Winnipeg Jets</option>
+
+  </select>
+  
+
+  <script>
+    function updateImage(select) {
+      var selectedImage = select.value;
+      document.getElementById('selected-image').src = selectedImage;
+    }
+  </script>
+
+</body>
+</html>

@@ -96,7 +96,8 @@ if __name__ == "__main__":
     df = pd.read_csv(path_tidy_data_csv, low_memory=False)
 
     # 2. Read shot df
-    df_shot = df[df['eventType'] == "Shot"]
+    # df_shot = df[df['eventType'] == "Shot"]
+    df_shot = df
     df_shot['gamePk'] = df_shot['gamePk'].astype(str)
     df_shot = df_shot.dropna(subset=['x-coordinate', 'y-coordinate']) # Drop row with NaN value
     df_shot.reset_index(drop=True, inplace=True)
@@ -197,7 +198,7 @@ if __name__ == "__main__":
             plt.colorbar(label='Excess shot rate per hours')
             
             # --- h. Save shot map image
-            file_name_shot_map = f"{season}_{team_name}.jpg"
+            file_name_shot_map = f"{team_name}.jpg"
             path_file_shot_map = os.path.join(path_folder_shot_map_season, file_name_shot_map)
             plt.savefig(path_file_shot_map)
             plt.close()
