@@ -8,6 +8,7 @@ class Crawler:
         self.base_url = "https://statsapi.web.nhl.com/api/v1/"
         self.dataset_path = Path("Dataset")
         self.dataset_path.mkdir(parents=True, exist_ok=True)
+        self.dataset_info_path = self.dataset_path / Path("dataset_info.json")
 
         self.game_types = {
             "preseason": "01",
@@ -18,6 +19,14 @@ class Crawler:
         self.inv_game_types = {v: k for k, v in self.game_types.items()}
 
         self.data = dict()
+        self.dataset_info = dict()
+
+        self.dataset_start_season = None
+        self.dataset_end_season = None
+        if self.dataset_info_path.is_file():
+            dataset_info = json.loads(open(self.dataset_info_path, "r").read())
+            self.dataset_start_season = dataset_info["start_season"]
+            self.dataset_end_season = dataset_info["end_season"]
 
     def get_regular_game_id(self, season, number):
         number = str(number).zfill(4)
@@ -88,6 +97,9 @@ class Crawler:
         return data
 
     def get_total_data(self, start_season=2016, end_season=2020):
+        self.dataset_info["start_season"] = start_season
+        self.dataset_info["end_season"] = end_season
+
         for season in range(start_season, end_season + 1):
             self.data[season] = dict()
             self.data[season]["regular_season"] = self.get_regular_data(season)
@@ -102,6 +114,10 @@ class Crawler:
                     file_name = f"{game_data['gamePk']}.json"
                     with open(file_dir / file_name, "w") as file:
                         json.dump(game_data, file)
+
+    def write_dataset_info(self):
+        with open(self.dataset_info_path, "w") as file:
+            json.dump(self.dataset_info, file)
 
     def read_data(self):
         data = dict()
@@ -125,6 +141,7 @@ class Crawler:
     def crawl(self):
         self.get_total_data()
         self.write_data()
+        self.write_dataset_info()
 
 
 if __name__ == "__main__":
