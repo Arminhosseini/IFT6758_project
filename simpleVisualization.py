@@ -67,11 +67,13 @@ class HockeyFigure:
                       palette=['#FF0000', '#0000FF'])
 
         # Customize the plot
-        plt.xticks(rotation=20)
-        plt.ylabel('Count of Shots')
-        plt.xlabel('Type of Shot')
-        plt.title('Shot & Goal Count Per Type of Shot and Percentage of Successful Goals for 2016-2017 season')
-        ax.legend(labels=['Shots', 'Goals'], loc='upper right')
+        plt.xticks(rotation=20, fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.ylabel('Count of Shots', fontdict={'size': 16})
+        plt.xlabel('Type of Shot', fontdict={'size': 16})
+        plt.title('Shot & Goal Count Per Type of Shot and Percentage of Successful Goals for 2016-2017 season',
+                  fontdict={'size': 20})
+        ax.legend(labels=['Shots', 'Goals'], loc='upper right', fontsize=16)
 
         # Calculate and add goal and shot counts and percentages on top of the bars
         for idx, p in enumerate(ax.patches):
@@ -86,7 +88,7 @@ class HockeyFigure:
                 ax.text(
                     p.get_x() + p.get_width() / 2., height + 30,
                     f'Shots: {shot_count}\nGoals: {goal_count}\nPercentage: {percentage_goals:.2f}%',
-                    size=12, ha="center"
+                    size=16, ha="center"
                 )
 
         figures_dir = SAVE_FIG_PATH
