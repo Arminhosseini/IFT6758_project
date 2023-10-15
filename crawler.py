@@ -168,6 +168,10 @@ class Crawler:
         data = dict()
         # Loop through all JSON files in the dataset directory and its subdirectories
         for game_data_path in self.dataset_path.glob("**/**/*.json"):
+            # Continue if the path is related to dataset information
+            if "dataset_info" in str(game_data_path):
+                continue
+
             # Extract information from the file path
             tokens = str(game_data_path).split(".")[0].split("/")[1:4]
             season, type, game_id = int(tokens[0]), tokens[1], int(tokens[2])
