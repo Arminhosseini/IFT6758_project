@@ -86,11 +86,11 @@ if __name__ == "__main__":
             "all-star": "04",
     }
     
-    ice_rink_image_path = os.path.join("Images", "Advanced_visualization", "half_nhl_rink.png")
+    ice_rink_image_path = os.path.join("images", "advanced_visualization", "half_nhl_rink.png")
     
     alpha = 0.3
     
-    path_folder_shot_map = os.path.join("Images", "Advanced_visualization")
+    path_folder_shot_map = os.path.join("images", "advanced_visualization")
 
     # ========================================================================
    
@@ -208,3 +208,4 @@ if __name__ == "__main__":
             plt.close()
     
         print(f"Done season {season}")
+    print(f"[INFO] The shot maps are stored in the foldler images/advanced_visualization")

@@ -9,7 +9,7 @@ import seaborn as sns
 TIDY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'Dataset', 'tidyData.csv')
 
 # save the figures
-SAVE_FIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'images', 'simpleVisualization'))
+SAVE_FIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'images', 'simple_visualization'))
 
 
 # Define a function to compute shot distance based on attackingSide
