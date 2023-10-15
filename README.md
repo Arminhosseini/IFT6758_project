@@ -2,7 +2,8 @@
 ### This is an overview of the final data frame
 
 ### dataFrame.head(10): 
-![data frame](dataFrame_head.png)
+![data frame](dataframe-1.png)
+![data frame](dataframe-2.png)
 
 
 ### Actual strength of players
