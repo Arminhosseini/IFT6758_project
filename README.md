@@ -2,14 +2,14 @@
 ### This is an overview of the final data frame
 
 ### dataFrame.head(10): 
-![data frame](dataframe-1.png)
-![data frame](dataframe-2.png)
+![data frame](dataframe.png)
 
 
 ### Actual strength of players
 
-One possible way to find the actual strength of the players in each event of a game is to start with 5 on 5 and then adjust the number of players according to the penalties that occur. For example, if a penalty leads to an ejection of a player, the number of players for that team will decrease by one for the duration of the penalty. If an event happens during that time, the actual strength of the players will be the number of players for each team after accounting for the penalties. Similarly, if another penalty occurs while a previous penalty is still in effect, the number of players will decrease accordingly.
+One possible way to find the actual strength of the players in each event of a game is to start with 5 on 5 and then adjust the number of players according to the [penalties][1] that occur. For example, if a penalty leads to an ejection of a player, the number of players for that team will decrease by one for the duration of the penalty. If an event happens during that time, the actual strength of the players will be the number of players for each team after accounting for the penalties. Similarly, if another penalty occurs while a previous penalty is still in effect, the number of players will decrease accordingly.
 
+[1]: https://www.purehockey.com/c/hockey-rules-and-penalties 
 
 ### Additional features
 
