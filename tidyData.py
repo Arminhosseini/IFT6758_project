@@ -1,6 +1,6 @@
 import pandas as pd
 from os import listdir
-from crawler_notpushed import Crawler
+from crawler import Crawler
 
 # Define a function to filter events and keep only "Shot" and "Goal"
 
