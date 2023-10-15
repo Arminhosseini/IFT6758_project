@@ -405,6 +405,5 @@ Dataset/
 test.ipynb
 test.jpg
 test_file.json
-test_visualization.ipynb
-visualization_backup.ipynb
-visualization.ipynb
+Images/nhl_coor.jpg
+Images/nhl_rink.png

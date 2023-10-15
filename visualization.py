@@ -65,7 +65,8 @@ def Correct_Side_Rink_Coordinate(list_x_coor, list_y_coor):
 if __name__ == "__main__":
     
     # =========================== Hyper Parameter ===========================
-    path_tidy_data_csv = r"Dataset\tidyData.csv"
+    path_tidy_data_csv = os.path.join("Dataset", "tidyData.csv")
+    # path_tidy_data_csv = r"Dataset\tidyData.csv"
     
     bin_width = 5
     
@@ -75,7 +76,8 @@ if __name__ == "__main__":
     nhl_rink_width = 200
     nhl_rink_height = 85
     
-    extent_coordinate = [0, nhl_rink_width//2, -nhl_rink_height//2, nhl_rink_height//2]
+    # extent_coordinate = [0, nhl_rink_width//2, -nhl_rink_height//2, nhl_rink_height//2]
+    extent_coordinate = [-nhl_rink_height//2, nhl_rink_height//2, 0, nhl_rink_width//2]
     
     game_types = {
             "preseason": "01",
@@ -84,11 +86,11 @@ if __name__ == "__main__":
             "all-star": "04",
     }
     
-    ice_rink_image_path = os.path.join("Image", "half_nhl_rink.png")
+    ice_rink_image_path = os.path.join("Images", "Advanced_visualization", "half_nhl_rink.png")
     
-    alpha = 0.35
+    alpha = 0.3
     
-    path_folder_shot_map = os.path.join("Image", "shot_map_team")
+    path_folder_shot_map = os.path.join("Images", "Advanced_visualization")
 
     # ========================================================================
    
@@ -179,6 +181,7 @@ if __name__ == "__main__":
             plt.clf()
             
             image = Image.open(ice_rink_image_path)
+            image = np.rot90(image)
             plt.imshow(image, alpha=alpha, extent=extent_coordinate) # Plot ice rink
 
             plt.xlabel('Distance from the center red line (ft)')
@@ -193,6 +196,7 @@ if __name__ == "__main__":
             elif data_max > abs(data_min):
                 data_min = data_max * -1
 
+            hist_diff = np.rot90(hist_diff) # Rotate
             plt.contourf(hist_diff.T, extent=extent_coordinate, vmin=data_min, vmax=data_max,\
                         cmap='RdBu_r', levels = np.linspace(data_min, data_max, 12), alpha=1-alpha)
             plt.colorbar(label='Excess shot rate per hours')
@@ -203,4 +207,4 @@ if __name__ == "__main__":
             plt.savefig(path_file_shot_map)
             plt.close()
     
-        print(f"Done {season}")
+        print(f"Done season {season}")
