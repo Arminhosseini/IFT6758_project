@@ -32,7 +32,10 @@ Or you can just download our zip file!
 
 ### Step 2. Install Environment
 ```
-cd project
+cd IFT6758_project
+virtualenv venv
+source venv/bin/activate
+pip install -r requirement.txt
 ```
 
 ### Step 3. Download NHL Play-by-Play Data (It will take some time :))
