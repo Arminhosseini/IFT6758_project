@@ -11,15 +11,16 @@
 [Click here!](https://nguyenthaivu.github.io/)
 
 ## Prerequisites
--pandas
--numpy
--matplotlib
--seaborn
--requests
--scipy
--plotly
--ipywidgets
--Of course the python environment is essential!
+- pandas
+- numpy
+- matplotlib
+- seaborn
+- requests
+- scipy
+- plotly
+- ipywidgets
+  
+Of course the python environment is essential!
 
 ## Run Locally
 
@@ -38,13 +39,13 @@ cd project
 ``` 
 python crawler.py
 ```
-You can also check out [this page](https://github.com/Arminhosseini/IFT6758_project/blob/main/docs/crawler.md)for a more detailed guide
+You can also check out [this page](https://github.com/Arminhosseini/IFT6758_project/blob/main/docs/crawler.md) for a more detailed guide
 
 ### Step 4. Check the Interactive NHL Game Data Panel
 ```
 run interactive_debugging_tool.ipynb
 ```
-You can also check out [this page](https://github.com/Arminhosseini/IFT6758_project/blob/main/docs/interactive_debugging_tool.md)for a more detailed guide
+You can also check out [this page](https://github.com/Arminhosseini/IFT6758_project/blob/main/docs/interactive_debugging_tool.md) for a more detailed guide
 
 ### Step 5. Clean data to get the tidy data
 ```
