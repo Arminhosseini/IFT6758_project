@@ -2,10 +2,10 @@
 [Repo URL](https://github.com/Arminhosseini/IFT6758_project)
 
 ## Authors
-- [@Shilong Zhou](shilong.zhou@umontreal.ca)
-- [@Seyed Armin Hosseini](seyed.armin.hosseini@umontreal.ca)
-- [@Sepehr Babapour](sepehr.babapour@umontreal.ca)
-- [@Thai Vu Nguyen](thai.vu.nguyen@umontreal.ca)
+- [@Shilong Zhou](https://github.com/sl-Zhou)
+- [@Seyed Armin Hosseini](https://github.com/Arminhosseini)
+- [@Sepehr Babapour](https://github.com/sprbpr)
+- [@Thai Vu Nguyen](https://github.com/NguyenThaiVu)
 
 ## Blog post page
 [Click here!](https://nguyenthaivu.github.io/)
