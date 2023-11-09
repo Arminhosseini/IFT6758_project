@@ -6,3 +6,4 @@ requests
 scipy
 plotly
 ipywidgets
+comet_ml
