@@ -179,6 +179,7 @@ def main():
     PATH_TIDY_DATA_CSV = r"Dataset/feature_engineering1.csv"
 
     df = pd.read_csv(PATH_TIDY_DATA_CSV)
+    print(f"[INFO] Read df from: {PATH_TIDY_DATA_CSV}")
     print(f"Shape of df: {df.shape}")
 
     fe2 = Feature_Engineering_2()
@@ -186,6 +187,7 @@ def main():
 
     path_output_csv = os.path.join("Dataset", "tidyData_fe2.csv")
     df_fe2.to_csv(path_output_csv)
+    print(f"[INFO] Save df to: {path_output_csv}")
 
 
 main()
