@@ -46,18 +46,17 @@ class feature_engineering():
 
     """
 
-    def __init__(self, train_date: list) -> None:
+    def __init__(self) -> None:
         """
         Initializes a FeatureEngineering1 object.
 
         Args:
-        train_date (list): A list of dates corresponding to the training data.
+        None
 
         Returns:
         None
         """
         self.data = None
-        self.train_date = train_date
         pass
 
     def save_data(self, path: str) -> pd.DataFrame:
@@ -89,11 +88,8 @@ class feature_engineering():
         data: pd.DataFrame
             The data with the .csv format existed in the specified path 
         """
-        df = pd.read_csv(path)
-        df['dateTime'] = pd.to_datetime(df['dateTime'])
-
-        # save only the elements which years are in self.train_date
-        self.data = df[df['dateTime'].dt.year.isin(self.train_date)]
+        # read data from csv file into a dataframe
+        self.data = pd.read_csv(path)
 
     def get_data(self) -> pd.DataFrame:
         """
@@ -331,7 +327,7 @@ if __name__ == "__main__":
     # exp = experiment_init()
 
     # initialize feature engineering class
-    fe = feature_engineering(train_date=[2016, 2017, 2018, 2019])
+    fe = feature_engineering()
 
     # read data from csv file into a dataframe and store it in the class attribute
     fe.read_data(os.environ.get('TIDY_DATA_PATH'))
