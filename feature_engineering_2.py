@@ -155,12 +155,6 @@ class Feature_Engineering_2:
                 print(f"Error at index {idx_sample}")
                 print(f"Error: {error}")
                 break
-        
-        print(len(list_last_event_type))
-        print(len(list_coor_x_last_event))
-        print(len(list_coor_y_last_event))
-        print(len(list_time_last_event))
-        print(len(list_distance_last_event))
 
         assert len(list_last_event_type) == len(list_coor_x_last_event) == \
                 len(list_coor_y_last_event) == len(list_time_last_event) == len(list_distance_last_event)
