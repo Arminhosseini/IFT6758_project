@@ -436,12 +436,7 @@ def remove_extra_features(df):
              'distance_last_event', 'is_rebound', 'Change in shot angle', 'Speed', 'power_play_time', 'n_friend',
              'n_oppose', 'isgoal']]
     df['period_second'] = df['periodTime'].apply(Time_String_To_Seconds)
-    # df["game_second"] = df.apply(
-    #     lambda x: x["period"] * 60 * 20
-    #               + sum(int(x) * 60 ** i for i, x in enumerate(x["periodTime"].split(":")[::-1]))
-    # )
-    df["game_second"] = df['period'] * 60 * 20 + df['period_second']
-    df.drop(['periodTime'], axis=1)
+    df["game_second"] = (df['period'] - 1) * 60 * 20 + df['period_second']
 
     return df
 def main():
@@ -463,6 +458,9 @@ def main():
     df_fe4 = fe4.add_bonus_feats(df_fe3)
     print("[INFO] Feature Engineering (Bonus) is completed!")
 
+    path_to_csv = os.path.join("Dataset", "feature_engineering2.csv")
+    df_fe4.to_csv(path_to_csv)
+
     train, test_regular, test_playoffs = split_train_test(df_fe4)
     train = remove_extra_features(train)
     test_regular = remove_extra_features(test_regular)
@@ -483,7 +481,7 @@ def main():
 
     experiment = comet_ml.Experiment(api_key=slzhou_api_key, project_name=project_name, workspace=workspace_name)
 
-    artifact = Artifact(name="dataset", artifact_type="dataset", version="4.0.0")
+    artifact = Artifact(name="dataset", artifact_type="dataset", version="4.0.2")
     artifact.add(path_train_csv)
     artifact.add(path_test_regular_csv)
     artifact.add(path_test_playoff_csv)
