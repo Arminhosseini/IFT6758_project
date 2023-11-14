@@ -5,7 +5,7 @@ In the provided notebook, we implemented baseline models for predicting goal out
 ## Task 1 - Unveiling the Accuracy Paradox
 
 <figure>
-  <img style="float: left;" src="readme-imgs/hist.png" width="41%" height: auto>
+  <img style="float: left;" src="../images/baseline/hist.png" width="41%" height: auto>
 </figure>
 
 The evaluation results indicate a high accuracy of 91% on the validation set, but upon closer inspection of the precision, recall, and f1-score for label 1 (goal), it becomes apparent that the model is unable to correctly predict instances of this class, yielding zeros in these metrics. The issue arises from the significant class imbalance in the dataset, where label 0 (non-goal) vastly outnumbers label 1. With 276,782 samples for label 0 and only 29,032 samples for label 1, the model might be biased towards predicting the majority class, achieving high accuracy due to the dominance of label 0 in the dataset. However, this high accuracy is misleading, as the model struggles to capture the minority class (label 1).
@@ -13,7 +13,7 @@ The evaluation results indicate a high accuracy of 91% on the validation set, bu
 
 ## Task 2 - Evaluating Baselines
 
-<img src="readme-imgs/task2.png" width="90%" height: auto>
+<img src="../images/baseline/baseline-evaluation.png" width="90%" height: auto>
 
 Baseline Model - Distance: <a href="[url](https://www.comet.com/ift6758-b09-project/ift6758-project-milestone2/fd6f683bf9324bc4aafe732516e9ed38)">(Link)</a>
 
