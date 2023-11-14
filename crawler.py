@@ -96,7 +96,8 @@ class Crawler:
         while True:
             try:
                 # Generate a unique game ID for the current season and game number
-                game_id = self.get_playoff_game_id(season, round, matchup, game)
+                game_id = self.get_playoff_game_id(
+                    season, round, matchup, game)
                 # Fetch game data from the NHL API using the game ID
                 game_data = self.get_game_data(game_id)
                 data.append(game_data)
@@ -107,7 +108,8 @@ class Crawler:
                     game = 1
                     try:
                         # Generate a unique game ID for the current season and game number
-                        game_id = self.get_playoff_game_id(season, round, matchup, game)
+                        game_id = self.get_playoff_game_id(
+                            season, round, matchup, game)
                         # Fetch game data from the NHL API using the game ID
                         game_data = self.get_game_data(game_id)
                         data.append(game_data)
@@ -181,7 +183,8 @@ class Crawler:
                 data[season] = dict()
             if type not in data[season]:
                 data[season][type] = dict()
-            data[season][type][game_id] = json.loads(open(game_data_path, "r").read())
+            data[season][type][game_id] = json.loads(
+                open(game_data_path, "r").read())
 
         return data
 
@@ -193,7 +196,8 @@ class Crawler:
         type = self.inv_game_types[game_id_str[4:6]]
 
         # Construct the file path to the JSON file containing the game data
-        file_path = self.dataset_path.joinpath(season, type, f"{game_id_str}.json")
+        file_path = self.dataset_path.joinpath(
+            season, type, f"{game_id_str}.json")
 
         # Read the contents of the JSON file, and return the game data as a dictionary
         return json.loads(open(file_path, "r").read())
