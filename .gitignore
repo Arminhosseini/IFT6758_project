@@ -396,6 +396,8 @@ $RECYCLE.BIN/
 /Dataset/*
 ift6758_project
 /Dataset
+/models
+/downloaded_models
 
 tidy_data.ipynb
 explore_data.ipynb
