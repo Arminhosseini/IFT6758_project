@@ -269,7 +269,6 @@ class feature_engineering():
             p.set_xlabel('Distance from net')
             p.set_ylabel('Goal rate')
             p.set_title('Goal rate by distance from net')
-            plt.show()
 
         elif key == 'angle':
             # round the angle to the nearest integer
@@ -283,10 +282,11 @@ class feature_engineering():
             p.set_xlabel('Angle from net')
             p.set_ylabel('Goal rate')
             p.set_title('Goal rate by angle from net')
-            plt.show()
 
         if save:
             plt.savefig(path)
+
+        plt.show()
 
     def empty_net_histogram(self, path: str, save: bool = False):
         """
