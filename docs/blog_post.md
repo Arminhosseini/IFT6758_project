@@ -15,8 +15,13 @@ This figure shows how the probability of scoring a goal varies by the angle from
 
 ![alt text](../images/feature_engineering1/goal_rate_angle.png)
 
+This figure shows how the probability of scoring a goal changes with the distance from the net. We can see that the probability drops sharply at first, and then decreases gradually as the distance increases. This makes sense because it is harder to score from far away. However, the probability is not zero beyond a certain distance, and it fluctuates slightly. This may be because there are some outliers or exceptional shots that score from a long distance.
 
 ![alt text](../images/feature_engineering1/goal_rate_distance.png)
+
+
+
+![alt text](../images/feature_engineering1/empty_net.png)
 ## Advanced Models
 ### 1.
 
