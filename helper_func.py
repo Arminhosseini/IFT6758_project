@@ -75,23 +75,23 @@ def Visualize_Cumulative_Proportion(models, probs, y_true, path_output_image):
         plot_points = pd.DataFrame(columns=["bin", "goal_rate", "goal_cum"])
         goal_cum = 0
 
-    for j, bin in enumerate(np.flip(bins)):
-        n_goal = np.sum(y_true[perentile_bins == bin])
-        n_shot = np.sum(perentile_bins == bin)
-        goal_rate = n_goal / n_shot
-        goal_cum += n_goal / np.sum(y_true)
-        plot_points.loc[j] = [bin, goal_rate, goal_cum]
-    list_plot_points.append(plot_points)
+        for j, bin in enumerate(np.flip(bins)):
+            n_goal = np.sum(y_true[perentile_bins == bin])
+            n_shot = np.sum(perentile_bins == bin)
+            goal_rate = n_goal / n_shot
+            goal_cum += n_goal / np.sum(y_true)
+            plot_points.loc[j] = [bin, goal_rate, goal_cum]
+        list_plot_points.append(plot_points)
 
-    plot_points.loc[j + 1] = [100, 0, 0]
-    sns.lineplot(
-        data=plot_points,
-        x="bin",
-        y="goal_cum",
-        legend=False,
-        label="%s" % (models[i]),
-        ax=axs,
-    )
+        plot_points.loc[j + 1] = [100, 0, 0]
+        sns.lineplot(
+            data=plot_points,
+            x="bin",
+            y="goal_cum",
+            legend=False,
+            label="%s" % (models[i]),
+            ax=axs,
+        )
 
     axs.set_title(f"Cumulative % of Goal")
     axs.set_xlabel("Shot probability model percentile")
