@@ -42,9 +42,6 @@ if __name__ == "__main__":
 
     plot_results.append(res)
 
-    xgml.plot_calibration_curve(res, os.getenv(
-        "XGB_IMAGE_PATH") + 'xgboost_baseline' + '_calibration_curve.png')
-
     param_grid = {
         'objective': ['binary:logistic'],
         'max_depth': [3, 5, 7],
@@ -76,9 +73,6 @@ if __name__ == "__main__":
 
     plot_results.append(res)
 
-    xgml.plot_calibration_curve(res, os.getenv(
-        "XGB_IMAGE_PATH") + 'xgboost_hp_tuning' + '_calibration_curve.png')
-
     print('Performing feature selection...')
     train_data_feature_selected = xgml.feature_selection(train_data, train_label, best_params, os.getenv(
         "XGB_IMAGE_PATH") + 'feature_importance.png', os.getenv("XGB_IMAGE_PATH") + 'shap_importance.png')
@@ -98,7 +92,7 @@ if __name__ == "__main__":
 
     plot_results.append(res)
 
-    xgml.plot_calibration_curve(res, os.getenv(
+    xgml.plot_calibration_curve(['xgboost_baseline', 'xgboost_hp_tuning', 'xgboost_feature_selected'], plot_results, os.getenv(
         "XGB_IMAGE_PATH") + 'xgboost_feature_selected' + '_calibration_curve.png')
 
     xgml.plot_roc_simple(

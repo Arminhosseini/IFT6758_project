@@ -11,7 +11,7 @@ import shap
 import functools
 import operator
 from xgboost import plot_importance
-from sklearn.calibration import CalibrationDisplay
+from sklearn.calibration import calibration_curve
 import xgboost as xgb
 import plotly.graph_objects as go
 from sklearn.metrics import roc_auc_score, roc_curve, accuracy_score, confusion_matrix
@@ -310,16 +310,28 @@ class xgboost_model():
         plt.savefig(save_path)
         plt.show()
 
-    def plot_calibration_curve(self, results, save_path):
-        y_prob = functools.reduce(
-            operator.iconcat, results['val']['probabilities'], [])
-        y_true = functools.reduce(
-            operator.iconcat, results['val']['labels'], [])
-        disp = CalibrationDisplay.from_predictions(
-            y_true, y_prob, n_bins=10, name='XGBoost', strategy='uniform')
-        disp.ax_.set_title('Calibration curve')
-        disp.figure_.savefig(save_path)
+    def plot_calibration_curve(self, models, results, save_path):
+        fig = plt.figure()
+        plt.title(f"Calibration Curve")
+        plt.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
+        for i in range(len(models)):
+            y_prob = functools.reduce(
+                operator.iconcat, results[i]['val']['probabilities'], [])
+            y_true = functools.reduce(
+                operator.iconcat, results[i]['val']['labels'], [])
+            prob_true, prob_pred = calibration_curve(
+                y_true, y_prob, n_bins=20)
+            plt.plot(prob_pred, prob_true, "s-", label="%s" % (models[i]))
+
+        plt.xlabel("P(Pred)")
+        plt.ylabel("P(Goal|Pred)")
+        plt.legend()
+
+        plt.xticks(np.arange(0, 1.2, 0.2))
+        plt.yticks(np.arange(0, 1.2, 0.2))
         plt.show()
+
+        fig.savefig(save_path)
 
     def log_experiment(self, results, experiment_tag, log_model, model_name, model_path, hp, hparameters):
         experiment = Experiment(api_key=os.getenv("COMET_API_KEY"), project_name=os.getenv(
