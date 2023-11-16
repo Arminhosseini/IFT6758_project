@@ -210,25 +210,52 @@ class xgboost_model():
         fig.show()
         fig.write_image(save_path)
 
-    def plot_goal_rate(self, results, save_path):
-        goal_rate_mean = []
-        for i in range(len(results['val']['probabilities'])):
-            df = pd.DataFrame(
-                {'isgoal': results['val']['labels'][i], 'probabilities': results['val']['probabilities'][i]})
-            # calculate shot probability model percentile for each shot
-            df['percentile'] = df['probabilities'].rank(pct=True)
-            # group shots by percentile and calculate goal rate for each group
-            goal_rates = df.groupby(pd.cut(df['percentile'], bins=[
-                                    0]+[i/10 for i in range(1, 11)], include_lowest=True), observed=False)['isgoal'].mean()
-            goal_rate_mean.append(goal_rates)
+    def plot_roc_simple(self, models, results, save_path):
+        for j, model in enumerate(models):
+            fpr_mean = np.linspace(0, 1, 10)
+            interp_tprs = []
+            for i in range(10):
+                fpr = results[j]['val']['fpr'][i]
+                tpr = results[j]['val']['tpr'][i]
+                interp_tpr = np.interp(fpr_mean, fpr, tpr)
+                interp_tpr[0] = 0.0
+                interp_tprs.append(interp_tpr)
+            tpr_mean = np.mean(interp_tprs, axis=0)
+            auc = np.mean(results[j]['val']['auc'])
+            plt.plot(fpr_mean, tpr_mean,
+                     label=f"{model} (area = {round(auc, 2)})")
 
-        goal_rate_mean = np.array(goal_rate_mean).mean(axis=0)
-        goal_rates_mid = []
-        for i in range(len(goal_rates.index)):
-            goal_rates_mid.append(goal_rates.index[i].mid)
+        plt.plot(fpr_mean, fpr_mean, linestyle='--',
+                 color='r', label='random guess')
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("ROC Curve")
+        plt.legend(loc="lower right")
+        plt.savefig(save_path)
+        plt.show()
 
-        # plot the goal rates as a function of the shot probability model percentile
-        plt.plot(np.array(goal_rates_mid) * 100, goal_rate_mean)
+    def plot_goal_rate(self, models, results, save_path):
+        for j, model in enumerate(models):
+            goal_rate_mean = []
+            for i in range(len(results[j]['val']['probabilities'])):
+                df = pd.DataFrame(
+                    {'isgoal': results[j]['val']['labels'][i], 'probabilities': results[j]['val']['probabilities'][i]})
+                # calculate shot probability model percentile for each shot
+                df['percentile'] = df['probabilities'].rank(pct=True)
+                # group shots by percentile and calculate goal rate for each group
+                goal_rates = df.groupby(pd.cut(df['percentile'], bins=[
+                                        0]+[i/10 for i in range(1, 11)], include_lowest=True), observed=False)['isgoal'].mean()
+                goal_rate_mean.append(goal_rates)
+
+            goal_rate_mean = np.array(goal_rate_mean).mean(axis=0)
+            goal_rates_mid = []
+            for i in range(len(goal_rates.index)):
+                goal_rates_mid.append(goal_rates.index[i].mid)
+
+            # plot the goal rates as a function of the shot probability model percentile
+            plt.plot(np.array(goal_rates_mid) * 100,
+                     goal_rate_mean, label=model)
+
         plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
         plt.yticks(np.arange(0, 1.1, 0.1))
         plt.xticks(np.arange(0, 110, 10))
@@ -237,36 +264,40 @@ class xgboost_model():
         plt.title('Goal Rate')
         plt.ylabel('Goals / (Shots + Goals)')
         plt.grid(True)
+        plt.legend()
         plt.savefig(save_path)
         plt.show()
 
-    def plot_cumulative(self, results, save_path):
-        goal_rate_mean = []
-        for i in range(len(results['val']['probabilities'])):
-            df = pd.DataFrame(
-                {'isgoal': results['val']['labels'][i], 'probabilities': results['val']['probabilities'][i]})
-            # calculate shot probability model percentile for each shot
-            df['percentile'] = df['probabilities'].rank(pct=True)
-            # group shots by percentile and calculate goal rate for each group
-            goal_rates = df.groupby(pd.cut(df['percentile'], bins=[
-                                    0]+[i/10 for i in range(1, 11)], include_lowest=True), observed=False)['isgoal'].mean()
-            # Calculate the frequency and percentage of goals for each group
-            goal_freq = goal_rates * goal_rates.index.to_series().apply(lambda x: x.length)
-            goal_perc = goal_freq / goal_freq.sum()
-            # cum_goal_perc = goal_perc.cumsum(axis=0)
-            cum_goal_perc = np.cumsum(goal_perc[::-1])[::-1]
-            goal_rate_mean.append(cum_goal_perc)
+    def plot_cumulative(self, models, results, save_path):
+        for j, model in enumerate(models):
+            goal_rate_mean = []
+            for i in range(len(results[j]['val']['probabilities'])):
+                df = pd.DataFrame(
+                    {'isgoal': results[j]['val']['labels'][i], 'probabilities': results[j]['val']['probabilities'][i]})
+                # calculate shot probability model percentile for each shot
+                df['percentile'] = df['probabilities'].rank(pct=True)
+                # group shots by percentile and calculate goal rate for each group
+                goal_rates = df.groupby(pd.cut(df['percentile'], bins=[
+                                        0]+[i/10 for i in range(1, 11)], include_lowest=True), observed=False)['isgoal'].mean()
+                # Calculate the frequency and percentage of goals for each group
+                goal_freq = goal_rates * goal_rates.index.to_series().apply(lambda x: x.length)
+                goal_perc = goal_freq / goal_freq.sum()
+                # cum_goal_perc = goal_perc.cumsum(axis=0)
+                cum_goal_perc = np.cumsum(goal_perc[::-1])[::-1]
+                goal_rate_mean.append(cum_goal_perc)
 
-        goal_rate_mean = np.array(goal_rate_mean).mean(axis=0)
-        goal_rates_mid = []
-        for i in range(len(goal_rates.index)):
-            goal_rates_mid.append(goal_rates.index[i].mid)
+            goal_rate_mean = np.array(goal_rate_mean).mean(axis=0)
+            goal_rates_mid = []
+            for i in range(len(goal_rates.index)):
+                goal_rates_mid.append(goal_rates.index[i].mid)
 
-        goal_rate_mean = np.append(goal_rate_mean, 0)
-        goal_rates_mid = np.append(goal_rates_mid, 1)
+            goal_rate_mean = np.append(goal_rate_mean, 0)
+            goal_rates_mid = np.append(goal_rates_mid, 1)
 
-        # plot the goal rates as a function of the shot probability model percentile
-        plt.plot(np.array(goal_rates_mid) * 100, goal_rate_mean)
+            # plot the goal rates as a function of the shot probability model percentile
+            plt.plot(np.array(goal_rates_mid) * 100,
+                     goal_rate_mean, label=model)
+
         plt.gca().yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
         plt.yticks(np.arange(0, 1.1, 0.1))
         plt.xticks(np.arange(0, 110, 10))
@@ -274,6 +305,7 @@ class xgboost_model():
         plt.xlabel('Shot Probability Model Percentile')
         plt.ylabel('Proportion')
         plt.title('Cumulative % of Goals')
+        plt.legend()
         plt.grid(True)
         plt.savefig(save_path)
         plt.show()
@@ -289,7 +321,7 @@ class xgboost_model():
         disp.figure_.savefig(save_path)
         plt.show()
 
-    def log_experiment(self, results, experiment_tag, log_model, model_name, model_path):
+    def log_experiment(self, results, experiment_tag, log_model, model_name, model_path, hp, hparameters):
         experiment = Experiment(api_key=os.getenv("COMET_API_KEY"), project_name=os.getenv(
             "COMET_PROJECT_NAME"), workspace=os.getenv("COMET_WORKSPACE"))
         accuracy = np.mean(results['val']['accuracy'])
@@ -300,6 +332,8 @@ class xgboost_model():
         experiment.log_metrics(metrics)
         experiment.add_tag(experiment_tag)
         experiment.log_confusion_matrix(matrix=confusion_matrix)
+        if hp:
+            experiment.log_parameters(hparameters)
         if log_model:
             experiment.log_model(model_name, model_path)
 
