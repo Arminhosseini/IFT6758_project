@@ -93,7 +93,7 @@ if __name__ == "__main__":
     plot_results.append(res)
 
     xgml.plot_calibration_curve(['xgboost_baseline', 'xgboost_hp_tuning', 'xgboost_feature_selected'], plot_results, os.getenv(
-        "XGB_IMAGE_PATH") + 'xgboost_feature_selected' + '_calibration_curve.png')
+        "XGB_IMAGE_PATH") + 'calibration_curve.png')
 
     xgml.plot_roc_simple(
         ['xgboost_baseline', 'xgboost_hp_tuning', 'xgboost_feature_selected'], plot_results, os.getenv("XGB_IMAGE_PATH") + 'roc.png')
