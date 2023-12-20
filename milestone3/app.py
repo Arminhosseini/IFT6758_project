@@ -1,13 +1,3 @@
-"""
-If you are in the same directory as this file (app.py), you can run run the app using gunicorn:
-    
-    $ gunicorn --bind 0.0.0.0:<PORT> app:app
-
-gunicorn can be installed via:
-
-    $ pip install gunicorn
-
-"""
 import os
 from pathlib import Path
 import logging
@@ -86,32 +76,35 @@ def download_registry_model():
     model_name = json.get('model_name')
     version = json.get('version')
 
+    model_file_name = f"{model_name}.sav"
 
-    if os.path.isfile(model_name):
-        global_model = pickle.load(open(model_name, 'rb'))
-        log_str = f"Success load model {model_name}"
+    if os.path.isfile(model_file_name):
+        global_model = pickle.load(open(model_file_name, 'rb'))
+        log_str = f"Success load model {model_file_name}"
         app.logger.info(log_str)
+        return jsonify(log_str), 200
     else:
         try:
             # Download model
             api = API(api_key=os.environ.get('COMET_API_KEY'))
-            models_dir = os.join.path("./")
+            models_dir = os.path.join("./")
             downloaded_model = api.get_model(workspace=workspace, model_name=model_name)
             downloaded_model.download(version, output_folder=models_dir, expand=True)
 
             # Load model
-            path_model = os.path.join(models_dir, downloaded_model)
+            path_model = os.path.join(models_dir, model_file_name)
             global_model = pickle.load(open(path_model, 'rb'))
             
-            log_str = f"Success download from Comet and load model {model_name}"
+            log_str = f"Success download from Comet and load model {model_file_name}"
             app.logger.info(log_str)
+            return jsonify(log_str), 200
         except:
-            log_str = f"FAIL to download model from Comet"
+            log_str = f"FAIL to download model from Comet. Use the default model."
             app.logger.info(log_str)
+            return jsonify(log_str), 200
 
-    response = log_str
-    app.logger.info(response)
-    return jsonify(response), 200
+    log_str = f"Something wrong with function download_registry_model()."
+    return jsonify(log_str), 500
 
 
 @app.route("/predict", methods=["POST"])
@@ -129,20 +122,20 @@ def predict():
         app.logger.info(json)
 
         X = []
-        if "dist" in json:
-            dist = json.get('dist')
+        if "shot distance" in json:
+            dist = json.get('shot distance')
             X.append(dist)
-        if "angle" in json:
-            angle = json.get('angle')
+        if "shot angle" in json:
+            angle = json.get('shot angle')
             X.append(angle)
 
         X = np.array([X])
         if len(X.shape) < 2:
             X = np.expand_dims(X, axis=0)
 
-        y_pred = global_model.predict(X)[0]
+        y_pred = global_model.predict_proba(X)[0, 1]
         
-        response = jsonify({'y_pred': int(y_pred)})
+        response = jsonify({'y_pred': round(y_pred, 4)})
         app.logger.info(response)
         return response, 200
     

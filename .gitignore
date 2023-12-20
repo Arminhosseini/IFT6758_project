@@ -405,3 +405,6 @@ explore_data.ipynb
 test.ipynb
 .env
 baseline-model-test.ipynb
+
+milestone3/log_reg_ang.sav
+milestone3/log_reg_dist.sav
