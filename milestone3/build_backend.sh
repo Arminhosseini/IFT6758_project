@@ -1,0 +1,1 @@
+docker build -t my-flask-app --build-arg SERVING_PORT=5000 -f Dockerfile.serving .

@@ -40,15 +40,23 @@ def get_team_name(path_out_json_game_data):
     return (home_team_name, away_team_name)
 
 
-def get_actual_goal(path_out_json_game_data):
+def get_actual_goal(path_json_game_data):
+    """
+    This function read the game data (json file) and get the actual goal
+    * Arguments:
+    path_json_game_data -- a string, indicate the path to json file
+    
+    * Returns:    
+    goals -- a dictionay, with the following format {'homeScore': 0, 'awayScore': 0}
+    """
 
     goals = {'homeScore': 0, 'awayScore': 0}
 
-    with open(path_out_json_game_data) as json_file:
+    with open(path_json_game_data) as json_file:
         game_data = json.load(json_file)
 
+    # Loop through each event of games
     list_event = game_data['plays'] 
-    # Loop through each event of game
     for event in list_event:
         event_type = event['typeDescKey']
         if event_type == "goal":
@@ -59,12 +67,17 @@ def get_actual_goal(path_out_json_game_data):
 
 
 
-def process_feature(path_out_json_game_data):
+def process_feature(path_json_game_data):
     """
-    This function will read game data (json file) and return dataframe
+    This function will read game data (json file) and return processed dataframe
+    * Argument:
+    path_json_game_data -- a string, indicate the path to json file
+
+    * Returns:
+    game_df -- a data frame, indicate the output dataframe
     """
 
-    game_df = get_list_event_of_game(path_out_json_game_data)
+    game_df = get_list_event_of_game(path_json_game_data)
     game_df['shot_distance'] = game_df.apply(compute_shot_distance, axis=1)
     game_df['shot_angle'] = game_df.apply(compute_shot_angle, axis=1)
     game_df['isgoal'] = game_df['event type'].apply(lambda x: 1 if x == 'goal' else 0)
