@@ -55,16 +55,6 @@ def download_registry_model():
     Handles POST requests made to http://IP_ADDRESS:PORT/download_registry_model
 
     The comet API key should be retrieved from the ${COMET_API_KEY} environment variable.
-
-    Recommend (but not required) json with the schema:
-
-        {
-            workspace: (required),
-            model: (required),
-            version: (required),
-            ... (other fields if needed) ...
-        }
-    
     """
     global global_model  # Declare the global variable
 
@@ -122,11 +112,11 @@ def predict():
         app.logger.info(json)
 
         X = []
-        if "shot distance" in json:
-            dist = json.get('shot distance')
+        if "shot_distance" in json:
+            dist = json.get('shot_distance')
             X.append(dist)
-        if "shot angle" in json:
-            angle = json.get('shot angle')
+        if "shot_angle" in json:
+            angle = json.get('shot_angle')
             X.append(angle)
 
         X = np.array([X])

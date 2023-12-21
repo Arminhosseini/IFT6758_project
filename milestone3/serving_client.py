@@ -12,11 +12,12 @@ logger = logging.getLogger(__name__)
 
 class ServingClient:
     def __init__(self, ip: str = "0.0.0.0", port: int = 5000, features=None):
+
         self.base_url = f"http://{ip}:{port}"
         logger.info(f"Initializing client; base URL: {self.base_url}")
 
         if features is None:
-            features = ["distance"]
+            features = ["shot_distance"]
         self.features = features
 
         # any other potential initialization
@@ -97,11 +98,11 @@ if __name__ == "__main__":
     
     load_dotenv()
     PATH_INPUT_DATAFRAME = Path(r"/home/thaiv7/Desktop/IFT6758_project/dataset_new/processed_data.csv")
+
     X = pd.read_csv(PATH_INPUT_DATAFRAME)
 
-    feature = ['shot distance']
+    feature = ['shot_distance']
     serving_client = ServingClient(features=feature)
-
 
     # list_output = serving_client.predict(X)
     # logs_data = serving_client.logs()
@@ -111,4 +112,3 @@ if __name__ == "__main__":
     version = "1.0.0"
 
     download_info = serving_client.download_registry_model(workspace, model_name, version)
-    print(download_info)

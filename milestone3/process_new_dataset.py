@@ -52,7 +52,7 @@ def define_net_coordinate(game_df):
 
 
 
-def get_list_event_of_game(path_game_file, list_chosen_event):
+def get_list_event_of_game(path_game_file, list_chosen_event = ['shot-on-goal', 'goal']):
     """
     This function get list event of the game.
 
@@ -176,7 +176,7 @@ def compute_shot_angle(row):
     """
 
     try:
-        shot_angle_rad = np.arcsin(row['y coor'] / row['shot distance'])
+        shot_angle_rad = np.arcsin(row['y coor'] / row['shot_distance'])
     except:
         shot_angle_rad = np.nan
     return shot_angle_rad
@@ -247,8 +247,8 @@ if __name__ == "__main__":
                 game_df = get_list_event_of_game(path_game_file, LIST_CHOSEN_EVENT)
 
                 # Process more feature
-                game_df['shot distance'] = game_df.apply(compute_shot_distance, axis=1)
-                game_df['shot angle'] = game_df.apply(compute_shot_angle, axis=1)
+                game_df['shot_distance'] = game_df.apply(compute_shot_distance, axis=1)
+                game_df['shot_angle'] = game_df.apply(compute_shot_angle, axis=1)
                 game_df['isgoal'] = game_df['event type'].apply(lambda x: 1 if x == 'goal' else 0)
                 game_df['is empty net'] = game_df.apply(check_empty_net, axis=1)
 
