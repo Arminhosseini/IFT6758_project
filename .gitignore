@@ -396,5 +396,15 @@ $RECYCLE.BIN/
 /Dataset/*
 ift6758_project
 /Dataset
+/models
+/downloaded_models
+/dataset_new
 
 tidy_data.ipynb
+explore_data.ipynb
+test.ipynb
+.env
+baseline-model-test.ipynb
+
+milestone3/log_reg_ang.sav
+milestone3/log_reg_dist.sav
