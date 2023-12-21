@@ -1,0 +1,1 @@
+docker run -e COMET_API_KEY=j3DrC3ChXkR42WfPCUh5EIkye -p 5000:5000 my-flask-app
