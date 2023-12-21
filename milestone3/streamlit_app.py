@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 from game_client import *
 
 
-IP = r"127.0.0.1"
-PORT = r"5000"
-BASE_URL = f"http://{IP}:{PORT}"
+SERVING_IP = os.environ.get("SERVING_IP", "127.0.0.1")
+SERVING_PORT = os.environ.get("SERVING_PORT", "5000")
+BASE_URL = f"http://{SERVING_IP}:{SERVING_PORT}"
 
 
 load_dotenv()
@@ -28,20 +28,22 @@ if __name__ == "__main__":
     version = st.sidebar.selectbox("Select Version", options=["1.0.0"])
 
     if st.sidebar.button('Get model'):
-        # Code to handle model selection
         if model_name == 'log_red_dist':
             features = ["shot_distance"]
+            st.sidebar.success(f"Success load model {model_name}")
         elif model_name == 'log_reg_ange':
             features = ["shot_angle"]
+            st.sidebar.success(f"Success load model {model_name}")
         elif model_name == 'log_reg_dist_ang':
             features = ["shot_distance", "shot_angle"]
+            st.sidebar.success(f"Success load model {model_name}")
         else:
-            st.error("Please choose model")
+            st.sidebar.error("Please choose model")
     # =============================================================================================
 
 
     # Load model 
-    serving_client = ServingClient(features=features)
+    serving_client = ServingClient(ip=SERVING_IP, port=SERVING_PORT, features=features)
     download_info = serving_client.download_registry_model(workspace, model_name, version)
 
 
@@ -69,7 +71,7 @@ if __name__ == "__main__":
             serving_client = ServingClient(features=features)
             list_output = serving_client.predict(game_df)
 
-            game_df_pred = pd.concat([game_df, list_output], axis=1, index=False)
+            game_df_pred = pd.concat([game_df, list_output], axis=1)
             game_df_pred.to_csv(path_output_file_predict)
 
 

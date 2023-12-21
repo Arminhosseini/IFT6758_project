@@ -94,21 +94,21 @@ class ServingClient:
     
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
-    load_dotenv()
-    PATH_INPUT_DATAFRAME = Path(r"/home/thaiv7/Desktop/IFT6758_project/dataset_new/processed_data.csv")
+#     load_dotenv()
+#     PATH_INPUT_DATAFRAME = Path(r"/home/thaiv7/Desktop/IFT6758_project/dataset_new/processed_data.csv")
 
-    X = pd.read_csv(PATH_INPUT_DATAFRAME)
+#     X = pd.read_csv(PATH_INPUT_DATAFRAME)
 
-    feature = ['shot_distance']
-    serving_client = ServingClient(features=feature)
+#     feature = ['shot_distance']
+#     serving_client = ServingClient(features=feature)
 
-    # list_output = serving_client.predict(X)
-    # logs_data = serving_client.logs()
+#     # list_output = serving_client.predict(X)
+#     # logs_data = serving_client.logs()
 
-    workspace = r"ift6758-b09-project"
-    model_name="log_reg_ang"
-    version = "1.0.0"
+#     workspace = r"ift6758-b09-project"
+#     model_name="log_reg_ang"
+#     version = "1.0.0"
 
-    download_info = serving_client.download_registry_model(workspace, model_name, version)
+#     download_info = serving_client.download_registry_model(workspace, model_name, version)

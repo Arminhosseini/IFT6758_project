@@ -1,11 +1,9 @@
-import os
 from pathlib import Path
+import os
 import logging
 from flask import Flask, jsonify, request, abort
-import sklearn
 import pandas as pd
 import numpy as np
-import joblib
 import pickle
 from comet_ml import API
 
@@ -77,7 +75,9 @@ def download_registry_model():
         try:
             # Download model
             api = API(api_key=os.environ.get('COMET_API_KEY'))
-            models_dir = os.path.join("./")
+            # models_dir = os.path.join("./")
+            models_dir = Path("Dataset")
+            models_dir.mkdir(parents=True, exist_ok=True)
             downloaded_model = api.get_model(workspace=workspace, model_name=model_name)
             downloaded_model.download(version, output_folder=models_dir, expand=True)
 
