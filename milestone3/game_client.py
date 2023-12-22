@@ -8,16 +8,23 @@ from dotenv import load_dotenv
 
 from new_crawler import Crawler
 from process_new_dataset import *
-from serving_client import *
 
 
 def get_game_data_and_save_2_json(game_id, path_output_folder):
     """
-    This function will get game data (by game_id) and Store to json file
-
+    This function will get game data (by game_id) and save to json file
+    * Argument:
+    game_id -- a string, indicate the game id
+    path_output_folder -- a string, indicate the path to output folder
+    
+    * Return:
+    path_out_json_game_data -- a string, indicate path of output game data file (json file)
     """
     c = Crawler()
     json_game_data = c.get_game_data(game_id=game_id)
+
+    if os.path.exists(path_output_folder) == False:
+        os.mkdir(path_output_folder)
 
     path_out_json_game_data = os.path.join(path_output_folder, f"{game_id}.json")
     with open(path_out_json_game_data, "w") as file:
@@ -25,13 +32,19 @@ def get_game_data_and_save_2_json(game_id, path_output_folder):
 
     return path_out_json_game_data
 
-
-def get_team_name(path_out_json_game_data):
+    
+def get_team_name(path_json_game_data):
     """
     This function will read game data (json file) and extract the name of home and away team
+    * Arguments:
+    path_json_game_data -- a string, indicate the path to json file
+    
+    * Returns:  
+    home_team_name -- a string.
+    away_team_name -- a string.
     """
 
-    with open(path_out_json_game_data) as json_file:
+    with open(path_json_game_data) as json_file:
         game_data = json.load(json_file)
 
     home_team_name = game_data['homeTeam']['name']['default']
@@ -66,7 +79,6 @@ def get_actual_goal(path_json_game_data):
     return goals
 
 
-
 def process_feature(path_json_game_data):
     """
     This function will read game data (json file) and return processed dataframe
@@ -78,17 +90,38 @@ def process_feature(path_json_game_data):
     """
 
     game_df = get_list_event_of_game(path_json_game_data)
+
+    # Process more feature
     game_df['shot_distance'] = game_df.apply(compute_shot_distance, axis=1)
     game_df['shot_angle'] = game_df.apply(compute_shot_angle, axis=1)
     game_df['isgoal'] = game_df['event type'].apply(lambda x: 1 if x == 'goal' else 0)
     game_df['is empty net'] = game_df.apply(check_empty_net, axis=1)
 
-    # Remove redundant features
-    if "Unnamed: 0" in game_df.columns:
+    if "Unnamed: 0" in game_df.columns:    # Remove redundant features
         game_df = game_df.drop(columns=['Unnamed: 0'])
 
     return game_df
 
+
+def get_last_event(path_json_game_data):
+    """
+    This function will read game data (json file) and get the last event of the game 
+
+    * Argument:
+    path_json_game_data -- a string, indicate the path to json file
+
+    * Returns:
+    last_event -- a dictionary, indicate the info of last event
+    """
+
+    with open(path_json_game_data) as json_file:
+        game_data = json.load(json_file)
+
+    # Extract info of last event
+    list_events = list(game_data['plays'])
+    last_event = list_events[-1]
+
+    return last_event
 
 
 

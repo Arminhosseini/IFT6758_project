@@ -20,7 +20,6 @@ class ServingClient:
             features = ["shot_distance"]
         self.features = features
 
-        # any other potential initialization
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """

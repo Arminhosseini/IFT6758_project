@@ -1,17 +1,17 @@
 FROM python:3.9-slim
 
-WORKDIR /serving
+WORKDIR /app
 
-COPY ./app.py /serving
-COPY ./requirements.txt /serving
-COPY ./log_reg_dist.sav /serving
+COPY ./app.py /app
+COPY ./requirements.txt /app
+COPY ./log_reg_dist.sav /app
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 ARG SERVING_PORT
-ENV SERVING_PORT=${SERVING_PORT}
-EXPOSE ${SERVING_PORT}
+ENV SERVING_PORT=5000
+EXPOSE 5000
 
 ENV COMET_API_KEY comet_api
 
-CMD exec gunicorn --bind 0.0.0.0:${SERVING_PORT} app:app
+CMD gunicorn --bind 0.0.0.0:5000 app:app

@@ -1,0 +1,1 @@
+docker build -t streamlit-app -f Dockerfile.streamlit .
