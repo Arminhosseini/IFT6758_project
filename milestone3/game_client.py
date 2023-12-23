@@ -134,30 +134,35 @@ def get_last_event(json_game_data):
 
 def handle_saved_game_id(previous_game_df, current_game_df, serving_client):
     
-    if len(previous_game_df) == len(current_game_df): # nothing news happend
+    if previous_game_df.shape[0] == current_game_df.shape[0]: # nothing news happend
         return previous_game_df
     
-    elif len(previous_game_df) < len(current_game_df): # new data is coming
-        try:
-            # Extract new event
-            n_old_samples = previous_game_df.shape[0]
-            n_new_samples = current_game_df.shape[0]
-            # game_df_new = current_game_df.iloc[n_old_samples:n_new_samples, :]
-            game_df_new = current_game_df.tail(n_new_samples - n_old_samples)
+    elif previous_game_df.shape[0] < current_game_df.shape[0]: # new data is coming
+        
+        # Extract new event
+        n_old_samples = previous_game_df.shape[0]
+        n_new_samples = current_game_df.shape[0]
+        # game_df_new = current_game_df.iloc[n_old_samples:n_new_samples, :]
+        game_df_new = current_game_df.tail(n_new_samples - n_old_samples)
 
-            # Perform prediction
-            list_output_new = serving_client.predict(game_df_new)
-            game_df_new_pred = pd.concat([game_df_new, list_output_new], axis=1, ignore_index=True)
+        # Perform prediction
+        list_output_new = serving_client.predict(game_df_new)
 
-            # Merge old prediction and new prediction
-            previous_game_df = previous_game_df.loc[:, ~previous_game_df.columns.str.contains('^Unnamed')]
-            game_df_new_pred = game_df_new_pred.loc[:, ~game_df_new_pred.columns.str.contains('^Unnamed')]
+        game_df_new.reset_index(drop=True, inplace=True)
+        list_output_new.reset_index(drop=True, inplace=True)
+        game_df_new_pred = pd.concat([game_df_new, list_output_new], axis=1)
 
-            game_df_pred = pd.concat([previous_game_df, game_df_new_pred], axis=0, ignore_index=True)
-            return game_df_pred
-        except:
-            # previous_game_df = previous_game_df.loc[:, ~previous_game_df.columns.str.contains('^Unnamed')]
-            return None
+        # Merge old prediction and new prediction
+        # previous_game_df = previous_game_df.loc[:, ~previous_game_df.columns.str.contains('^Unnamed')]
+
+        previous_game_df.reset_index(drop=True, inplace=True)
+        game_df_new_pred.reset_index(drop=True, inplace=True)
+        game_df_pred = pd.concat([previous_game_df, game_df_new_pred], axis=0, ignore_index=True)
+        # game_df_pred = previous_game_df.append(game_df_new_pred, ignore_index=True)
+
+        # game_df_pred = game_df_pred.loc[:, ~game_df_pred.columns.str.contains('^Unnamed')]
+        
+        return game_df_pred
 
 # if __name__ == "__main__":
 

@@ -114,7 +114,7 @@ if __name__ == "__main__":
     # ====================================== Main area ======================================
     st.title('Hockey Visualization App')
 
-    game_id = st.text_input("Enter Game ID", "2022030411")
+    game_id = st.text_input("Enter Game ID", "2023020510")
     # game_id = st.text_input("Enter Game ID")
 
     if st.button('Ping game'):
@@ -140,8 +140,8 @@ if __name__ == "__main__":
             game_df = process_feature(json_game_data)  
 
             game_df_pred = handle_saved_game_id(game_df_pred, game_df, serving_client)
-            if game_df_pred != None:
-                game_df_pred.to_csv(path_output_file_predict)
+
+            game_df_pred.to_csv(path_output_file_predict)
 
         else:
             # Get data of game
