@@ -32,32 +32,46 @@ def get_game_data_and_save_2_json(game_id, path_output_folder):
 
     return path_out_json_game_data
 
-    
-def get_team_name(path_json_game_data):
+
+def get_game_data_json(game_id):
     """
-    This function will read game data (json file) and extract the name of home and away team
+    This function will get game data (by game_id)
+    * Argument:
+    game_id -- a string, indicate the game id
+    path_output_folder -- a string, indicate the path to output folder
+    
+    * Return:
+    json_game_data -- a json dictionary, indicate the game data under json format
+    """
+    c = Crawler()
+    json_game_data = c.get_game_data(game_id=game_id)
+    return json_game_data
+
+    
+def get_team_name(json_game_data):
+    """
+    This function extract the name of home and away team
     * Arguments:
-    path_json_game_data -- a string, indicate the path to json file
+    json_game_data -- a json dictionary, indicate the game data under json format
     
     * Returns:  
     home_team_name -- a string.
     away_team_name -- a string.
     """
-
-    with open(path_json_game_data) as json_file:
-        game_data = json.load(json_file)
-
-    home_team_name = game_data['homeTeam']['name']['default']
-    away_team_name = game_data['awayTeam']['name']['default']
+    try:
+        home_team_name = json_game_data['homeTeam']['name']['default']
+        away_team_name = json_game_data['awayTeam']['name']['default']
+    except:
+        home_team_name = away_team_name = None
 
     return (home_team_name, away_team_name)
 
 
-def get_actual_goal(path_json_game_data):
+def get_actual_goal(json_game_data):
     """
-    This function read the game data (json file) and get the actual goal
+    This function get the actual goal
     * Arguments:
-    path_json_game_data -- a string, indicate the path to json file
+    json_game_data -- a json dictionary, indicate the game data under json format
     
     * Returns:    
     goals -- a dictionay, with the following format {'homeScore': 0, 'awayScore': 0}
@@ -65,11 +79,8 @@ def get_actual_goal(path_json_game_data):
 
     goals = {'homeScore': 0, 'awayScore': 0}
 
-    with open(path_json_game_data) as json_file:
-        game_data = json.load(json_file)
-
     # Loop through each event of games
-    list_event = game_data['plays'] 
+    list_event = json_game_data['plays'] 
     for event in list_event:
         event_type = event['typeDescKey']
         if event_type == "goal":
@@ -79,17 +90,18 @@ def get_actual_goal(path_json_game_data):
     return goals
 
 
-def process_feature(path_json_game_data):
+def process_feature(json_game_data):
     """
     This function will read game data (json file) and return processed dataframe
-    * Argument:
-    path_json_game_data -- a string, indicate the path to json file
+    
+    * Arguments:
+    json_game_data -- a json dictionary, indicate the game data under json format
 
     * Returns:
     game_df -- a data frame, indicate the output dataframe
     """
 
-    game_df = get_list_event_of_game(path_json_game_data)
+    game_df = get_list_event_of_game(json_game_data)
 
     # Process more feature
     game_df['shot_distance'] = game_df.apply(compute_shot_distance, axis=1)
@@ -97,33 +109,55 @@ def process_feature(path_json_game_data):
     game_df['isgoal'] = game_df['event type'].apply(lambda x: 1 if x == 'goal' else 0)
     game_df['is empty net'] = game_df.apply(check_empty_net, axis=1)
 
-    if "Unnamed: 0" in game_df.columns:    # Remove redundant features
-        game_df = game_df.drop(columns=['Unnamed: 0'])
+    game_df = game_df.loc[:, ~game_df.columns.str.contains('^Unnamed')]
 
     return game_df
 
 
-def get_last_event(path_json_game_data):
+def get_last_event(json_game_data):
     """
     This function will read game data (json file) and get the last event of the game 
 
-    * Argument:
-    path_json_game_data -- a string, indicate the path to json file
+    * Arguments:
+    json_game_data -- a json dictionary, indicate the game data under json format
 
     * Returns:
     last_event -- a dictionary, indicate the info of last event
     """
 
-    with open(path_json_game_data) as json_file:
-        game_data = json.load(json_file)
-
     # Extract info of last event
-    list_events = list(game_data['plays'])
+    list_events = list(json_game_data['plays'])
     last_event = list_events[-1]
 
     return last_event
 
 
+def handle_saved_game_id(previous_game_df, current_game_df, serving_client):
+    
+    if len(previous_game_df) == len(current_game_df): # nothing news happend
+        return previous_game_df
+    
+    elif len(previous_game_df) < len(current_game_df): # new data is coming
+        try:
+            # Extract new event
+            n_old_samples = previous_game_df.shape[0]
+            n_new_samples = current_game_df.shape[0]
+            # game_df_new = current_game_df.iloc[n_old_samples:n_new_samples, :]
+            game_df_new = current_game_df.tail(n_new_samples - n_old_samples)
+
+            # Perform prediction
+            list_output_new = serving_client.predict(game_df_new)
+            game_df_new_pred = pd.concat([game_df_new, list_output_new], axis=1, ignore_index=True)
+
+            # Merge old prediction and new prediction
+            previous_game_df = previous_game_df.loc[:, ~previous_game_df.columns.str.contains('^Unnamed')]
+            game_df_new_pred = game_df_new_pred.loc[:, ~game_df_new_pred.columns.str.contains('^Unnamed')]
+
+            game_df_pred = pd.concat([previous_game_df, game_df_new_pred], axis=0, ignore_index=True)
+            return game_df_pred
+        except:
+            # previous_game_df = previous_game_df.loc[:, ~previous_game_df.columns.str.contains('^Unnamed')]
+            return None
 
 # if __name__ == "__main__":
 

@@ -52,7 +52,7 @@ def define_net_coordinate(game_df):
 
 
 
-def get_list_event_of_game(path_game_file, list_chosen_event = ['shot-on-goal', 'goal']):
+def get_list_event_of_game(game_data, list_chosen_event = ['shot-on-goal', 'goal']):
     """
     This function get list event of the game.
 
@@ -63,9 +63,6 @@ def get_list_event_of_game(path_game_file, list_chosen_event = ['shot-on-goal', 
     * Return:
     game_df -- a dataframe, indicate the dataframe of list events
     """
-
-    with open(path_game_file) as json_file:
-        game_data = json.load(json_file)
 
     list_event_type = []
     list_x_coor = []
@@ -151,15 +148,16 @@ def compute_shot_distance(row):
     * Returns:
     distance -- a float number.
     """
+    try:  
+        x = float(row['x coor'])
+        y = float(row['y coor'])
+        net_x = float(row['net x coor'])
+        net_y = float(row['net y coor'])
 
-    x = float(row['x coor'])
-    y = float(row['y coor'])
-    net_x = float(row['net x coor'])
-    net_y = float(row['net y coor'])
-
-    distance = np.nan
-    try:  distance = np.sqrt((x - net_x) ** 2 + (y - net_y) ** 2)
-    except:  distance = np.nan
+        distance = np.nan
+        distance = np.sqrt((x - net_x) ** 2 + (y - net_y) ** 2)
+    except: 
+        distance = np.nan
 
     return distance
 
@@ -219,44 +217,49 @@ def check_empty_net(row):
     return is_empty
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # ======================================================================================
-    PATH_FOLDER_DATA = Path(r"/home/thaiv7/Desktop/IFT6758_project/dataset_new")
-    PATH_OUTPUT_FILE = Path(r"/home/thaiv7/Desktop/IFT6758_project/dataset_new/processed_data.csv")
+#     # ======================================================================================
+#     PATH_FOLDER_DATA = Path(r"dataset_new")
+#     if os.path.exists(PATH_FOLDER_DATA) == False:
+#         os.mkdir(PATH_FOLDER_DATA)
 
-    LIST_SEASON = [2016, 2017, 2018, 2019, 2020]
-    LIST_GAME_TYPE = ['playoffs', 'regular_season']
-    LIST_CHOSEN_EVENT = ['shot-on-goal', 'goal']
+#     PATH_OUTPUT_FILE = os.path.join(PATH_FOLDER_DATA, "processed_data.csv")
 
-    # ======================================================================================
+#     LIST_SEASON = [2016, 2017, 2018, 2019, 2020]
+#     LIST_GAME_TYPE = ['playoffs', 'regular_season']
+#     LIST_CHOSEN_EVENT = ['shot-on-goal', 'goal']
 
-    df = pd.DataFrame()    # Final data frame
+#     # ======================================================================================
 
-    for season in LIST_SEASON:
-        path_season_folder = os.path.join(PATH_FOLDER_DATA, str(season))
-        for game_type in LIST_GAME_TYPE:
+#     df = pd.DataFrame()    # Final data frame
 
-            # Get list game (list of json file)
-            path_season_game_folder = os.path.join(path_season_folder, game_type)
-            list_game_name = sorted(os.listdir(path_season_game_folder))
+#     for season in LIST_SEASON:
+#         path_season_folder = os.path.join(PATH_FOLDER_DATA, str(season))
+#         for game_type in LIST_GAME_TYPE:
 
-            # Loop through all game in season
-            for game_name in list_game_name:
-                path_game_file = os.path.join(path_season_game_folder, game_name)
-                game_df = get_list_event_of_game(path_game_file, LIST_CHOSEN_EVENT)
+#             # Get list game (list of json file)
+#             path_season_game_folder = os.path.join(path_season_folder, game_type)
+#             list_game_name = sorted(os.listdir(path_season_game_folder))
 
-                # Process more feature
-                game_df['shot_distance'] = game_df.apply(compute_shot_distance, axis=1)
-                game_df['shot_angle'] = game_df.apply(compute_shot_angle, axis=1)
-                game_df['isgoal'] = game_df['event type'].apply(lambda x: 1 if x == 'goal' else 0)
-                game_df['is empty net'] = game_df.apply(check_empty_net, axis=1)
+#             # Loop through all game in season
+#             for game_name in list_game_name:
+#                 path_game_file = os.path.join(path_season_game_folder, game_name)
+#                 with open(path_game_file) as json_file:
+#                     game_data = json.load(json_file)        
+#                 game_df = get_list_event_of_game(game_data, LIST_CHOSEN_EVENT)
 
-                # Concat dateframe of current game (game_df) into final dataframe (df)
-                df = pd.concat([df, game_df], ignore_index=True)
+#                 # Process more feature
+#                 game_df['shot_distance'] = game_df.apply(compute_shot_distance, axis=1)
+#                 game_df['shot_angle'] = game_df.apply(compute_shot_angle, axis=1)
+#                 game_df['isgoal'] = game_df['event type'].apply(lambda x: 1 if x == 'goal' else 0)
+#                 game_df['is empty net'] = game_df.apply(check_empty_net, axis=1)
 
-        print(f"[INFO] Done process season {season}")
+#                 # Concat dateframe of current game (game_df) into final dataframe (df)
+#                 df = pd.concat([df, game_df], ignore_index=True)
 
-    df = df.dropna()
-    print(f"Shape of output df: {df.shape}")
-    df.to_csv(PATH_OUTPUT_FILE)
+#         print(f"[INFO] Done process season {season}")
+
+#     df = df.dropna()
+#     print(f"Shape of output df: {df.shape}")
+#     df.to_csv(PATH_OUTPUT_FILE)

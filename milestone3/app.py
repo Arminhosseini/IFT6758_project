@@ -75,9 +75,9 @@ def download_registry_model():
         try:
             # Download model
             api = API(api_key=os.environ.get('COMET_API_KEY'))
-            # models_dir = os.path.join("./")
-            models_dir = Path("Dataset")
-            models_dir.mkdir(parents=True, exist_ok=True)
+            models_dir = os.path.join("./")
+            # models_dir = Path("Dataset")
+            # models_dir.mkdir(parents=True, exist_ok=True)
             downloaded_model = api.get_model(workspace=workspace, model_name=model_name)
             downloaded_model.download(version, output_folder=models_dir, expand=True)
 
@@ -126,7 +126,7 @@ def predict():
         y_pred = global_model.predict_proba(X)[0, 1]
         
         response = jsonify({'y_pred': round(y_pred, 4)})
-        app.logger.info(response)
+        # app.logger.info(response)
         return response, 200
     
     except Exception as e:

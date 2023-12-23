@@ -1,3 +1,4 @@
+import sys
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -46,16 +47,47 @@ def visualize_shot_map(game_df, home_team_name, away_team_name):
     )
 
 
+def get_features(model_name):
+    """
+    This function get the features by inspect the model name
+
+    * Arguments:
+    model_name -- a string.
+    
+    * Return:
+    features -- a list, indicate a list of featues
+    """
+
+    if model_name == 'log_reg_dist':
+        features = ["shot_distance"]
+        st.sidebar.success(f"Success load model {model_name}")
+    elif model_name == 'log_reg_ang':
+        features = ["shot_angle"]
+        st.sidebar.success(f"Success load model {model_name}")
+    elif model_name == 'log_reg_dist_ang':
+        features = ["shot_distance", "shot_angle"]
+        st.sidebar.success(f"Success load model {model_name}")
+    else:
+        st.sidebar.error("Please choose model")
+        features = None
+
+    return features
+
 
 SERVING_IP = os.environ.get("SERVING_IP", "serving")
+# SERVING_PORT = int(os.environ.get("SERVING_POST", '5000'))
 SERVING_PORT = 5000
 # BASE_URL = f"http://{SERVING_IP}:{SERVING_PORT}"
 
-
-load_dotenv()
+# Folder to store game data 
 PATH_OUTPUT_FOLDER = os.path.join("game_client_data")
+if os.path.exists(PATH_OUTPUT_FOLDER) == False:
+    os.mkdir(PATH_OUTPUT_FOLDER)    
+
 game_df_pred = pd.DataFrame()
 features = ["shot_distance"]
+
+serving_client = ServingClient(ip=SERVING_IP, port=SERVING_PORT, features=features)
 
 
 if __name__ == "__main__":
@@ -65,29 +97,18 @@ if __name__ == "__main__":
     workspace = st.sidebar.selectbox("Select Workspace", options=['ift6758-b09-project'])
 
     st.sidebar.header('Model')
-    model_name = st.sidebar.selectbox("Select Model", options=['log_red_dist', 'log_reg_ange', 'log_reg_dist_ang'])
+    model_name = st.sidebar.selectbox("Select Model", options=['log_reg_dist', 'log_reg_ang', 'log_reg_dist_ang'])
 
     st.sidebar.header('Version')
     version = st.sidebar.selectbox("Select Version", options=["1.0.0"])
 
-    if st.sidebar.button('Get model'):
-        if model_name == 'log_red_dist':
-            features = ["shot_distance"]
-            st.sidebar.success(f"Success load model {model_name}")
-        elif model_name == 'log_reg_ange':
-            features = ["shot_angle"]
-            st.sidebar.success(f"Success load model {model_name}")
-        elif model_name == 'log_reg_dist_ang':
-            features = ["shot_distance", "shot_angle"]
-            st.sidebar.success(f"Success load model {model_name}")
-        else:
-            st.sidebar.error("Please choose model")
-    # =============================================================================================
+    get_model_button = st.sidebar.button('Get model')
 
-
-    # Load model 
-    serving_client = ServingClient(ip=SERVING_IP, port=SERVING_PORT, features=features)
-    download_info = serving_client.download_registry_model(workspace, model_name, version)
+    # Get features name and update serving client
+    if get_model_button:
+        features = get_features(model_name)
+        download_info = serving_client.download_registry_model(workspace, model_name, version)
+        serving_client.features = features
 
 
     # ====================================== Main area ======================================
@@ -97,40 +118,40 @@ if __name__ == "__main__":
     # game_id = st.text_input("Enter Game ID")
 
     if st.button('Ping game'):
-        file_predict_name = f"{game_id}_{''.join(features)}.csv"
+        features = get_features(model_name)
+        serving_client.features = features
+
+        file_predict_name = f"{game_id}_{'_'.join(features)}.csv"
         path_output_file_predict = os.path.join(PATH_OUTPUT_FOLDER, file_predict_name)
 
         # Check if we already predict it
         if os.path.exists(path_output_file_predict):  
-            game_df_pred = pd.read_csv(path_output_file_predict)
+            game_df_pred = pd.read_csv(path_output_file_predict)   # Read previous game 
 
             # Get data of new game
-            path_json_game_data = get_game_data_and_save_2_json(game_id, PATH_OUTPUT_FOLDER)
-            (home_team_name, away_team_name) = get_team_name(path_json_game_data)
-            
-            game_df = process_feature(path_json_game_data)  # process feature of game data
-            
-            if len(game_df) == len(game_df_pred): # nothing news happend
-                pass
-            elif len(game_df) > len(game_df_pred): # new data is coming
+            try: json_game_data = get_game_data_json(game_id)
+            except Exception as error:
+                st.error(f"The game id {game_id} is NOT exist.")
+                sys.exit()
+                
+            (home_team_name, away_team_name) = get_team_name(json_game_data)
 
-                # Extract new event
-                n_old_samples = game_df_pred.shape[0]
-                n_new_samples = game_df.shape[0]
-                game_df_new = game_df.iloc[n_old_samples:n_new_samples, :]
+            # Process feature of game data
+            game_df = process_feature(json_game_data)  
 
-                # Perform prediction
-                list_output_new = serving_client.predict(game_df_new)
-                game_df_pred_new = pd.concat([game_df_new, list_output_new], axis=1)
-
-                # Merge old prediction and new prediction
-                game_df_pred = pd.concat([game_df_pred, game_df_pred_new], axis=0)
+            game_df_pred = handle_saved_game_id(game_df_pred, game_df, serving_client)
+            if game_df_pred != None:
                 game_df_pred.to_csv(path_output_file_predict)
 
         else:
-            path_json_game_data = get_game_data_and_save_2_json(game_id, PATH_OUTPUT_FOLDER)
-            (home_team_name, away_team_name) = get_team_name(path_json_game_data)
-            game_df = process_feature(path_json_game_data)
+            # Get data of game
+            try: json_game_data = get_game_data_json(game_id)
+            except Exception as error:
+                st.error(f"The game id {game_id} is NOT exist.")
+                sys.exit()
+
+            (home_team_name, away_team_name) = get_team_name(json_game_data)
+            game_df = process_feature(json_game_data)
 
             list_output = serving_client.predict(game_df)
 
@@ -138,34 +159,38 @@ if __name__ == "__main__":
             game_df_pred.to_csv(path_output_file_predict)
 
         # Get predicted and actual goal
-        goals = get_actual_goal(path_json_game_data)
+        goals = get_actual_goal(json_game_data)
         home_actual_goal = goals['homeScore']
         away_actual_goal = goals['awayScore']
         home_expected_goal = round(game_df_pred[game_df_pred['team'] == 'home']['y_pred'].sum(), 2)
         away_expected_goal = round(game_df_pred[game_df_pred['team'] == 'away']['y_pred'].sum(), 2)
 
-        st.header(f"Game {game_id} between {home_team_name} and {away_team_name}")
-
         # Get info of last event 
-        last_event = get_last_event(path_json_game_data)
-        st.text(f"Period {last_event['period']} - {last_event['timeRemaining']} time left")
+        try:
+            last_event = get_last_event(json_game_data)
+            if last_event['typeDescKey'] == "game-end":
+                st.text(f"Period {last_event['period']} - {last_event['timeRemaining']} left (GAME END)")
+            else:
+                st.text(f"Period {last_event['period']} - {last_event['timeRemaining']} left")
+        except:
+            pass
 
         col1, col2 = st.columns(2)
         with col1:
             st.header(f"{home_team_name}")
             st.markdown("<span style='color:red; font-size: smaller;'>Home Team</span>", unsafe_allow_html=True)
-            home_delta = home_actual_goal - home_expected_goal
+            home_delta = round(home_actual_goal - home_expected_goal, 2)
             st.metric(label='xG (actual)', value=f'{home_expected_goal} ({home_actual_goal})', delta=home_delta)
-
         with col2:
             st.header(f"{away_team_name}")
             st.markdown("<span style='color:blue; font-size: smaller;'>Away Team</span>", unsafe_allow_html=True)
-            away_delta = away_actual_goal - away_expected_goal
+            away_delta = round(away_actual_goal - away_expected_goal, 2)
             st.metric(label='xG (actual)', value=f'{away_expected_goal} ({away_actual_goal})', delta=away_delta)
 
         # Show prediction to screen
         st.header('Data used for predictions (and predictions)')
-        if "Unnamed: 0" in game_df_pred.columns: game_df_pred.drop(columns=['Unnamed: 0'], inplace=True)
+        # if "Unnamed: 0" in game_df_pred.columns: game_df_pred.drop(columns=['Unnamed: 0'], inplace=True)
+        game_df_pred = game_df_pred.loc[:, ~game_df_pred.columns.str.contains('^Unnamed')]
         st.dataframe(game_df_pred)
 
         # Visualize shot map
